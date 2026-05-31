@@ -951,8 +951,25 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
   function handleSubmit(e) {
     e.preventDefault();
     const btn = e.target.querySelector('.btn-submit');
-    btn.textContent = 'Sent ✓'; btn.style.background = '#555';
-    setTimeout(() => { btn.textContent = 'Send →'; btn.style.background = ''; e.target.reset(); }, 2500);
+    const name = (document.getElementById('inputName')?.value || '').trim();
+    const from = (document.getElementById('inputEmail')?.value || '').trim();
+    const msg  = (document.getElementById('inputMsg')?.value || '').trim();
+
+    if (!msg) { document.getElementById('inputMsg')?.focus(); return; }
+
+    // 받는 사람: 작품 데이터의 작가 이메일 (없으면 기본값)
+    const to = (window.__EMBEDDED_DATA__ && window.__EMBEDDED_DATA__.artist && window.__EMBEDDED_DATA__.artist.email) || 'ychoi78@gmail.com';
+    const subject = '[포트폴리오 문의] ' + (name || from || '방문자');
+    const body = '이름: ' + name + '\n이메일: ' + from + '\n\n' + msg;
+    const href = 'mailto:' + to
+      + '?subject=' + encodeURIComponent(subject)
+      + '&body=' + encodeURIComponent(body);
+
+    // 방문자의 메일 앱을 미리 채워진 상태로 연다
+    window.location.href = href;
+
+    btn.textContent = '메일 앱 열림 ✓'; btn.style.background = '#555';
+    setTimeout(() => { btn.textContent = 'Send →'; btn.style.background = ''; }, 2500);
   }
 
   /* ── Nav active scroll ── */
