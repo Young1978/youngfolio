@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>관리자 · 최영환 포트폴리오</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--black:#111;--white:#fff;--bg:#f4f4f4;--card:#fff;--border:#e0e0e0;--gray:#888;--red:#c0392b;--green:#27ae60;--accent:#111}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--black);font-size:14px;line-height:1.6}
+
+/* ── 시작화면 ── */
+#startScreen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:40px}
+#startScreen h1{font-size:20px;font-weight:500;letter-spacing:0.04em}
+#startScreen p{font-size:13px;color:var(--gray);text-align:center;max-width:360px;line-height:1.8}
+.start-box{border:2px dashed #ccc;border-radius:12px;padding:40px 60px;display:flex;flex-direction:column;align-items:center;gap:14px;cursor:pointer;transition:border-color 0.2s;background:#fff}
+.start-box:hover{border-color:var(--black)}
+.start-box .icon{font-size:36px}
+.start-box .t{font-size:15px;font-weight:500}
+.start-box .sub{font-size:12px;color:var(--gray)}
+
+/* ── Topbar ── */
+.topbar{position:sticky;top:0;z-index:100;background:var(--black);color:var(--white);display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px}
+.topbar-title{font-size:13px;font-weight:400;letter-spacing:0.04em}
+.topbar-file{font-size:11px;color:rgba(255,255,255,0.5);margin-left:10px}
+.topbar-actions{display:flex;gap:10px}
+
+/* ── Buttons ── */
+.btn{border:none;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:0.06em;padding:9px 18px;border-radius:4px;transition:opacity 0.15s}
+.btn:hover{opacity:0.8}
+.btn-primary{background:var(--white);color:var(--black);font-weight:700}
+.btn-secondary{background:#333;color:var(--white)}
+.btn-ghost{background:transparent;border:1px solid #555;color:var(--white)}
+.btn-sm{font-size:11px;padding:5px 10px}
+.btn-add{background:var(--black);color:var(--white)}
+.btn-del{background:#f0e8e8;color:var(--red)}
+.btn-move{background:#f0f0f0;color:#555}
+
+/* ── Layout ── */
+.wrap{max-width:900px;margin:0 auto;padding:28px 24px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-bottom:24px}
+.card-header{margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.card-header h2{font-size:15px;font-weight:600;margin-bottom:3px}
+.card-header p{font-size:11px;color:var(--gray)}
+
+/* ── Form ── */
+label.field{display:block;margin-bottom:16px}
+.lbl{display:block;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:5px}
+input[type=text],input[type=email],input[type=url],textarea,select{width:100%;font-family:inherit;font-size:13px;border:1px solid var(--border);border-radius:5px;padding:8px 11px;background:#fff;outline:none;transition:border-color 0.2s}
+input:focus,textarea:focus,select:focus{border-color:var(--black)}
+textarea{resize:vertical;min-height:64px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row3{display:grid;grid-template-columns:90px 1fr 1fr;gap:12px}
+
+/* ── Item ── */
+.item{border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px;background:#fafafa}
+.item-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.item-head .t{font-size:12px;font-weight:600;color:#555}
+.item-head .grp{display:flex;gap:5px;flex-wrap:wrap}
+
+/* ── Images ── */
+.img-area{margin-top:12px}
+.img-area-lbl{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);margin-bottom:8px}
+.img-list{display:flex;flex-wrap:wrap;gap:8px}
+.img-slot{position:relative;width:88px;height:88px;border-radius:6px;overflow:hidden;border:1px solid var(--border);background:#e8e4df;flex-shrink:0}
+.img-slot img{width:100%;height:100%;object-fit:cover;display:block}
+.img-slot .x{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.65);color:#fff;border:none;cursor:pointer;border-radius:50%;width:20px;height:20px;font-size:13px;display:flex;align-items:center;justify-content:center}
+.img-slot .ml,.img-slot .mr{position:absolute;bottom:3px;background:rgba(0,0,0,0.5);color:#fff;border:none;cursor:pointer;border-radius:3px;width:22px;height:18px;font-size:11px;display:flex;align-items:center;justify-content:center}
+.img-slot .ml{left:3px}.img-slot .mr{right:3px}
+.img-add{position:relative;width:88px;height:88px;border-radius:6px;border:1.5px dashed #ccc;background:#f5f5f5;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#aaa;font-size:11px;gap:3px;flex-shrink:0}
+.img-add:hover{border-color:var(--black);color:var(--black)}
+.img-add input{position:absolute;opacity:0;inset:0;cursor:pointer;width:100%;height:100%}
+
+/* ── Hero preview ── */
+.hero-preview{width:100%;height:160px;object-fit:cover;border-radius:6px;display:block;margin-bottom:8px;border:1px solid var(--border)}
+.hero-ph{width:100%;height:80px;background:#e8e4df;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#999;font-size:12px;margin-bottom:8px;border:1.5px dashed #ccc}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--black);color:#fff;padding:12px 28px;border-radius:8px;font-size:12px;opacity:0;transition:opacity 0.25s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1}
+
+#editor{display:none}
+@media(max-width:640px){.row2,.row3{grid-template-columns:1fr}.topbar{padding:0 16px}.wrap{padding:16px}}
+
+/* ── 매체 섹션 ── */
+.medium-section { padding: 20px 0 8px; }
+.medium-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.medium-title {
+  font-size: 13px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--black);
+}
+.medium-divider {
+  border: none; border-top: 2px solid var(--border); margin: 20px 0 4px;
+}
+
+/* ── 드래그 정렬 ── */
+.item[draggable]{cursor:grab}
+.item[draggable]:active{cursor:grabbing}
+.item.drag-over{border:2px dashed #111;background:#f0f0f0}
+.item.dragging{opacity:0.4}
+.drag-handle{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;cursor:grab;color:#bbb;font-size:16px;
+  border-radius:4px;transition:color 0.15s;user-select:none;flex-shrink:0;
+}
+.drag-handle:hover{color:#555}
+.item-head-left{display:flex;align-items:center;gap:6px}
+</style>
+</head>
+<body>
+
+<!-- ── 시작 화면 ── -->
+<div id="startScreen">
+  <h1>최영환 포트폴리오 · 관리자</h1>
+  <p><strong>index.html</strong>이 들어 있는 <strong>폴더</strong>를 선택하면<br>내용을 불러와 수정하고, 저장 시 같은 폴더에 바로 반영됩니다.</p>
+  <div class="start-box" onclick="openFilePicker()">
+    <div class="icon">📁</div>
+    <div class="t">프로젝트 폴더 선택</div>
+    <div class="sub">index.html이 있는 폴더를 고르세요</div>
+  </div>
+  <!-- fallback for Safari/Firefox -->
+  <input type="file" accept=".html" id="fileInputFallback" style="display:none" onchange="loadFromInput(this)">
+</div>
+
+<!-- ── 에디터 ── -->
+<div id="editor">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="topbar-title">관리자 · 최영환 포트폴리오</span>
+      <span class="topbar-file" id="topbarFile"></span>
+      <span id="overwriteBadge" style="display:none;font-size:10px;background:#27ae60;color:#fff;padding:2px 8px;border-radius:10px;letter-spacing:0.04em">덮어쓰기 모드</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="openFilePicker()">다른 폴더</button>
+      <button class="btn btn-ghost" onclick="previewSite()">미리보기</button>
+      <button class="btn btn-ghost" onclick="openGhSettings()">⚙️ GitHub</button>
+      <button class="btn btn-primary" onclick="saveAll()">💾 저장 · 배포</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- 작가 정보 -->
+    <div class="card">
+      <div class="card-header"><h2>01 · 작가 정보</h2><p>이름, 소개글, 연락처, 히어로 배경</p></div>
+      <div class="row2">
+        <label class="field"><span class="lbl">이름 (한글)</span><input type="text" id="a_nameKo"></label>
+        <label class="field"><span class="lbl">이름 (영문)</span><input type="text" id="a_nameEn"></label>
+      </div>
+      <label class="field"><span class="lbl">한 줄 소개</span><input type="text" id="a_label"></label>
+      <div class="row2">
+        <label class="field"><span class="lbl">소개글 (KO)</span><textarea id="a_bio"></textarea></label>
+        <label class="field"><span class="lbl">소개글 (EN)</span><textarea id="a_bioEn"></textarea></label>
+      </div>
+      <div class="row2">
+        <label class="field"><span class="lbl">이메일</span><input type="email" id="a_email"></label>
+        <label class="field"><span class="lbl">인스타그램 URL</span><input type="url" id="a_instagramUrl"></label>
+      </div>
+      <div class="row2">
+        <label class="field"><span class="lbl">연락 문구 (KO)</span><textarea id="a_contactText"></textarea></label>
+        <label class="field"><span class="lbl">연락 문구 (EN)</span><textarea id="a_contactTextEn"></textarea></label>
+      </div>
+      <div class="row2">
+        <label class="field"><span class="lbl">푸터 (KO)</span><input type="text" id="a_footer"></label>
+        <label class="field"><span class="lbl">푸터 (EN)</span><input type="text" id="a_footerEn"></label>
+      </div>
+      <label class="field">
+        <span class="lbl">히어로 배경 이미지</span>
+        <img class="hero-preview" id="heroBgImg" style="display:none">
+        <div class="hero-ph" id="heroBgPh">배경 이미지 없음</div>
+        <div style="display:flex;gap:8px">
+          <label class="btn btn-sm btn-add" style="cursor:pointer;position:relative;overflow:hidden">
+            이미지 교체
+            <input type="file" accept="image/*" style="position:absolute;opacity:0;inset:0;cursor:pointer" onchange="uploadHeroBg(this)">
+          </label>
+          <button class="btn btn-sm btn-del" onclick="clearHeroBg()">삭제</button>
+        </div>
+      </label>
+    </div>
+
+    <!-- Works: 매체별 4섹션 -->
+    <div class="card">
+      <div class="card-header">
+        <h2>02 · 작품 (Works)</h2>
+        <p>매체별로 나뉘어 관리됩니다. 포트폴리오에서는 연도 최신순으로 표시됩니다.</p>
+      </div>
+
+      <!-- Installation -->
+      <div class="medium-section" id="sec_installation">
+        <div class="medium-header">
+          <span class="medium-title">Installation</span>
+          <button class="btn btn-sm btn-secondary" onclick="sortByYear('installation')">↓ 연도순</button>
+        </div>
+        <div id="worksBox_installation"></div>
+        <button class="btn btn-add btn-sm" onclick="addWork('installation')">+ Installation 작품 추가</button>
+      </div>
+
+      <div class="medium-divider"></div>
+
+      <!-- Video -->
+      <div class="medium-section" id="sec_video">
+        <div class="medium-header">
+          <span class="medium-title">Video</span>
+          <button class="btn btn-sm btn-secondary" onclick="sortByYear('video')">↓ 연도순</button>
+        </div>
+        <div id="worksBox_video"></div>
+        <button class="btn btn-add btn-sm" onclick="addWork('video')">+ Video 작품 추가</button>
+      </div>
+
+      <div class="medium-divider"></div>
+
+      <!-- Collage -->
+      <div class="medium-section" id="sec_collage">
+        <div class="medium-header">
+          <span class="medium-title">Collage</span>
+          <button class="btn btn-sm btn-secondary" onclick="sortByYear('collage')">↓ 연도순</button>
+        </div>
+        <div id="worksBox_collage"></div>
+        <button class="btn btn-add btn-sm" onclick="addWork('collage')">+ Collage 작품 추가</button>
+      </div>
+
+      <div class="medium-divider"></div>
+
+      <!-- Photography -->
+      <div class="medium-section" id="sec_photography">
+        <div class="medium-header">
+          <span class="medium-title">Photography</span>
+          <button class="btn btn-sm btn-secondary" onclick="sortByYear('photography')">↓ 연도순</button>
+        </div>
+        <div id="worksBox_photography"></div>
+        <button class="btn btn-add btn-sm" onclick="addWork('photography')">+ Photography 작품 추가</button>
+      </div>
+
+      <div class="medium-divider"></div>
+
+      <!-- Community · Public Art -->
+      <div class="medium-section" id="sec_community">
+        <div class="medium-header">
+          <span class="medium-title">Community · Public Art</span>
+          <button class="btn btn-sm btn-secondary" onclick="sortByYear('community')">↓ 연도순</button>
+        </div>
+        <div id="worksBox_community"></div>
+        <button class="btn btn-add btn-sm" onclick="addWork('community')">+ Community · Public Art 작품 추가</button>
+      </div>
+
+      <div class="medium-divider"></div>
+
+      <!-- Painting -->
+      <div class="medium-section" id="sec_painting">
+        <div class="medium-header">
+          <span class="medium-title">Painting</span>
+          <button class="btn btn-sm btn-secondary" onclick="sortByYear('painting')">↓ 연도순</button>
+        </div>
+        <div id="worksBox_painting"></div>
+        <button class="btn btn-add btn-sm" onclick="addWork('painting')">+ Painting 작품 추가</button>
+      </div>
+    </div>
+
+    <!-- CV -->
+    <div class="card">
+      <div class="card-header"><h2>03 · CV</h2><p>학력·개인전·단체전·수상·레지던시·강의</p></div>
+      <div id="cvBox"></div>
+      <button class="btn btn-add btn-sm" onclick="addCVCat()">+ 카테고리 추가</button>
+    </div>
+
+    <!-- Exhibitions -->
+    <div class="card">
+      <div class="card-header"><h2>04 · 전시 일정</h2><p>진행 중 / 예정 / 종료</p></div>
+      <div id="exBox"></div>
+      <button class="btn btn-add btn-sm" onclick="addEx()">+ 전시 추가</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════
+   상태
+══════════════════ */
+let data = null;
+let indexHtml = '';      // 원본 index.html 텍스트
+let fileHandle = null;   // File System Access API 핸들 (덮어쓰기용)
+let dirHandle = null;    // 프로젝트 폴더 핸들 (이미지+html 자동저장용)
+
+const A_FIELDS = ['nameKo','nameEn','label','bio','bioEn','email','instagramUrl','contactText','contactTextEn','footer','footerEn'];
+const CATS = [['installation','Installation'],['video','Video'],['collage','Collage'],['photography','Photography'],['community','Community · Public Art'],['painting','Painting']];
+const STATUS = [['current','진행 중'],['upcoming','예정'],['past','종료']];
+
+/* ══════════════════
+   파일 읽기
+══════════════════ */
+/* ── 폴더 열기: 폴더를 고르면 그 안의 index.html을 자동으로 불러옴 (Chrome/Edge) ──
+   폴더 핸들(dirHandle)을 잡아두므로 저장 시 재선택 없이 바로 같은 폴더에 반영된다. ── */
+async function openFilePicker() {
+  const inIframe = window.self !== window.top;
+
+  if (!inIframe && window.showDirectoryPicker) {
+    try {
+      const dh = await window.showDirectoryPicker({ mode: 'readwrite' });
+      let idxHandle;
+      try {
+        idxHandle = await dh.getFileHandle('index.html');
+      } catch(e) {
+        alert('선택한 폴더에 index.html이 없습니다.\nindex.html이 들어 있는 폴더를 선택해주세요.');
+        return;
+      }
+      dirHandle = dh;          // 저장 시 재사용
+      fileHandle = idxHandle;  // (호환용) index.html 핸들
+      const file = await idxHandle.getFile();
+      await readFileObject(file, 'index.html');
+      return;
+    } catch(e) {
+      if (e.name === 'AbortError') return;
+      // 권한 거부/미지원 등 → 파일 선택 fallback
+    }
+  }
+
+  // fallback (Safari/Firefox): 단일 파일 선택 → 저장은 zip 다운로드
+  dirHandle = null;
+  fileHandle = null;
+  document.getElementById('fileInputFallback').click();
+}
+
+function loadFromInput(input) {
+  fileHandle = null; // 핸들 없음 → 저장 시 다운로드
+  const file = input.files && input.files[0];
+  if (file) readFileObject(file, file.name);
+}
+
+function readFileObject(file, name) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        indexHtml = e.target.result;
+        data = extractData(indexHtml);
+        if (!data) throw new Error('데이터를 찾을 수 없습니다.\n\n올바른 포트폴리오 index.html인지 확인해주세요.');
+        delete data.__isEmbedded;
+        (data.works || []).forEach(w => {
+          // images_full/images_thumb → images 로 통합 (어드민에서는 하나로 관리)
+          if (w.images_full && w.images_full.length) {
+            w.images = w.images_full;
+          } else if (!w.images || !w.images.length) {
+            w.images = w.image ? [w.image] : [];
+          }
+          delete w.image;
+          delete w.images_full;
+          delete w.images_thumb;
+        });
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('editor').style.display = 'block';
+        document.getElementById('topbarFile').textContent = '· ' + name;
+        loadArtist(); renderWorks(); renderCV(); renderExhibitions();
+        document.querySelector('.btn-primary').textContent = '💾 저장';
+        const badge = document.getElementById('overwriteBadge');
+        if (badge) {
+          if (typeof window.showDirectoryPicker === 'function') {
+            badge.textContent = '폴더 자동저장';
+            badge.style.display = 'inline';
+          } else {
+            badge.textContent = 'ZIP 다운로드';
+            badge.style.display = 'inline';
+          }
+        }
+        toast('✓ ' + name + ' 불러오기 완료');
+        resolve();
+      } catch(err) { alert('파일 읽기 오류:\n' + err.message); reject(err); }
+    };
+    reader.readAsText(file);
+  });
+}
+
+function extractData(html) {
+  // __EMBEDDED_DATA__ 방식
+  const m1 = html.match(/window\.__EMBEDDED_DATA__ = (\{[\s\S]*?\});\s*\n\s*window\.__EMBEDDED_DATA__/);
+  if (m1) { try { return JSON.parse(m1[1]); } catch(e) {} }
+
+  // SITE_CONTENT fallback
+  const m2 = html.match(/window\.SITE_CONTENT = window\.SITE_CONTENT \|\| (\{[\s\S]*?\});\s*\n/);
+  if (m2) { try { return JSON.parse(m2[1]); } catch(e) {} }
+
+  // 더 넓은 범위 탐색
+  const sm = '/* [SITE_CONTENT_START] */';
+  const em = '/* [SITE_CONTENT_END] */';
+  const si = html.indexOf(sm), ei = html.indexOf(em);
+  if (si >= 0 && ei > si) {
+    const block = html.slice(si + sm.length, ei);
+    const jm = block.match(/\{[\s\S]+\}/);
+    if (jm) { try { return JSON.parse(jm[0]); } catch(e) {} }
+  }
+  return null;
+}
+
+/* ══════════════════
+   유틸
+══════════════════ */
+function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(msg, ms=2800){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),ms); }
+function move(arr,i,d){ const j=i+d; if(j<0||j>=arr.length)return false; [arr[i],arr[j]]=[arr[j],arr[i]]; return true; }
+function resizeImg(file, maxPx, q, cb){
+  const r=new FileReader(); r.onload=ev=>{
+    const img=new Image(); img.onload=()=>{
+      let w=img.width, h=img.height;
+      if(w>maxPx||h>maxPx){ const sc=Math.min(maxPx/w,maxPx/h); w=Math.round(w*sc); h=Math.round(h*sc); }
+      const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      cb(cv.toDataURL('image/jpeg',q));
+    }; img.src=ev.target.result;
+  }; r.readAsDataURL(file);
+}
+
+/* ══════════════════
+   작가 정보
+══════════════════ */
+function loadArtist(){
+  const a=data.artist||{};
+  A_FIELDS.forEach(f=>{ const el=document.getElementById('a_'+f); if(el) el.value=a[f]||''; });
+  setHeroBgPreview(a.heroBgImage||'');
+}
+A_FIELDS.forEach(f=>{
+  document.addEventListener('input', e=>{ if(e.target.id==='a_'+f){ if(!data.artist)data.artist={}; data.artist[f]=e.target.value; } });
+});
+function setHeroBgPreview(src){
+  const img=document.getElementById('heroBgImg'), ph=document.getElementById('heroBgPh');
+  if(src){ img.src=src; img.style.display='block'; ph.style.display='none'; }
+  else   { img.style.display='none'; ph.style.display='flex'; }
+}
+function uploadHeroBg(input){
+  if(!input.files||!input.files[0])return;
+  resizeImg(input.files[0],1920,0.88,url=>{ data.artist.heroBgImage=url; setHeroBgPreview(url); toast('✓ 배경 이미지 변경됨'); });
+}
+function clearHeroBg(){ data.artist.heroBgImage=''; setHeroBgPreview(''); }
+
+/* ══════════════════
+   Works
+══════════════════ */
+const MEDIUMS = ['installation','video','photography','community','painting','collage'];
+
+function renderWorks(){
+  // 각 매체 박스 초기화
+  MEDIUMS.forEach(cat => {
+    const box = document.getElementById('worksBox_' + cat);
+    if (box) box.innerHTML = '';
+  });
+
+  (data.works||[]).forEach((w,wi)=>{
+    const cat = w.category || 'installation';
+    const box = document.getElementById('worksBox_' + cat) || document.getElementById('worksBox_installation');
+    const opts=CATS.map(c=>`<option value="${c[0]}"${w.category===c[0]?' selected':''}>${c[1]}</option>`).join('');
+    const slots=(w.images||[]).map((src,ii)=>{
+      const ytMatch = src && src.includes('youtu') ? src.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/) : null;
+      const thumb = ytMatch ? `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg` : src;
+      const badge = ytMatch ? `<div style="position:absolute;bottom:3px;left:3px;background:rgba(255,0,0,0.85);color:#fff;font-size:9px;padding:1px 4px;border-radius:2px;font-weight:700">YT</div>` : '';
+      return `<div class="img-slot">
+        <img src="${esc(thumb)}" alt="">
+        ${badge}
+        <button class="x img-action" data-action="rm" data-wi="${wi}" data-ii="${ii}">×</button>
+        <button class="ml img-action" data-action="ml" data-wi="${wi}" data-ii="${ii}">‹</button>
+        <button class="mr img-action" data-action="mr" data-wi="${wi}" data-ii="${ii}">›</button>
+      </div>`;
+    }).join('');
+    const d=document.createElement('div'); d.className='item';
+    d.dataset.wi = wi;
+    d.setAttribute('draggable','true');
+    d.innerHTML=`
+      <div class="item-head">
+        <div class="item-head-left">
+          <span class="drag-handle" title="드래그하여 순서 변경">⠿</span>
+          <span class="t">작품 ${wi+1}${w.title?' · '+w.title:''}</span>
+        </div>
+        <div class="grp">
+          <button class="btn btn-move btn-sm work-action" data-action="up"  data-wi="${wi}">▲</button>
+          <button class="btn btn-move btn-sm work-action" data-action="down" data-wi="${wi}">▼</button>
+          <button class="btn btn-del btn-sm work-action"  data-action="del" data-wi="${wi}">삭제</button>
+        </div>
+      </div>
+      <div class="row2">
+        <label class="field"><span class="lbl">제목 (KO)</span>
+          <input type="text" value="${esc(w.title||'')}" oninput="data.works[${wi}].title=this.value;updateWorkTitle(${wi},this.value)">
+        </label>
+        <label class="field"><span class="lbl">제목 (EN)</span>
+          <input type="text" value="${esc(w.titleEn||'')}" oninput="data.works[${wi}].titleEn=this.value">
+        </label>
+      </div>
+      <div class="row2">
+        <label class="field"><span class="lbl">연도</span>
+          <input type="text" value="${esc(w.year||'')}" oninput="data.works[${wi}].year=this.value">
+        </label>
+        <label class="field"><span class="lbl">분류</span>
+          <select onchange="data.works[${wi}].category=this.value">${opts}</select>
+        </label>
+      </div>
+      <label class="field"><span class="lbl">재료·크기 등 (KO)</span>
+        <input type="text" value="${esc(w.desc||'')}" oninput="data.works[${wi}].desc=this.value">
+      </label>
+      <label class="field"><span class="lbl">재료·크기 등 (EN)</span>
+        <input type="text" value="${esc(w.descEn||'')}" oninput="data.works[${wi}].descEn=this.value">
+      </label>
+      <div class="img-area">
+        <div class="img-area-lbl">이미지 / 유튜브 (여러 장 · 모달에서 ← → 탐색)</div>
+        <div class="img-list">
+          ${slots}
+          <div class="img-add">
+            <span style="font-size:22px">+</span><span>이미지 추가</span>
+            <input type="file" accept="image/*" multiple onchange="addImgs(${wi},this)">
+          </div>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+          <input type="text" id="ytInput_${wi}" placeholder="유튜브 URL 붙여넣기 (예: https://youtu.be/xxxxx)" style="flex:1;font-size:12px">
+          <button class="btn btn-sm" style="background:#ff0000;color:#fff;flex-shrink:0" onclick="addYT(${wi})">▶ 유튜브 추가</button>
+        </div>
+      </div>`;
+    // 드래그 이벤트
+    d.addEventListener('dragstart', onDragStart);
+    d.addEventListener('dragover',  onDragOver);
+    d.addEventListener('dragleave', onDragLeave);
+    d.addEventListener('drop',      onDrop);
+    d.addEventListener('dragend',   onDragEnd);
+    if (box) box.appendChild(d);
+  });
+
+  // 이벤트 위임: img-action (이미지 삭제/이동)
+  document.querySelectorAll('.img-action').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      const wi = parseInt(btn.dataset.wi);
+      const ii = parseInt(btn.dataset.ii);
+      const action = btn.dataset.action;
+      if (action === 'rm') rmImg(wi, ii);
+      else if (action === 'ml') mvImg(wi, ii, -1);
+      else if (action === 'mr') mvImg(wi, ii, 1);
+    });
+  });
+
+  // 이벤트 위임: work-action (작품 삭제/이동)
+  document.querySelectorAll('.work-action').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      const wi = parseInt(btn.dataset.wi);
+      const action = btn.dataset.action;
+      if (action === 'up')   mvWork(wi, -1);
+      else if (action === 'down') mvWork(wi, 1);
+      else if (action === 'del')  delWork(wi);
+    });
+  });
+}
+function updateWorkTitle(wi, val){
+  const items=document.querySelectorAll('#worksBox .item-head .t');
+  if(items[wi]) items[wi].textContent=`작품 ${wi+1}${val?' · '+val:''}`;
+}
+/* ── 드래그 정렬 핸들러 ── */
+let _dragSrcWi = null;
+
+function onDragStart(e) {
+  _dragSrcWi = parseInt(this.dataset.wi);
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  this.classList.add('drag-over');
+}
+function onDragLeave() {
+  this.classList.remove('drag-over');
+}
+function onDrop(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  const targetWi = parseInt(this.dataset.wi);
+  if (_dragSrcWi === null || _dragSrcWi === targetWi) return;
+  // 배열에서 꺼내서 목표 위치에 삽입
+  const [moved] = data.works.splice(_dragSrcWi, 1);
+  data.works.splice(targetWi, 0, moved);
+  renderWorks();
+  toast('✓ 순서가 변경됐습니다');
+}
+function onDragEnd() {
+  this.classList.remove('dragging');
+  document.querySelectorAll('#worksBox .item').forEach(el => el.classList.remove('drag-over'));
+  _dragSrcWi = null;
+}
+
+function sortByYear(cat){
+  // 해당 매체만 정렬
+  const others = data.works.filter(w => (w.category||'installation') !== cat);
+  const sorted = data.works.filter(w => (w.category||'installation') === cat)
+    .sort((a,b)=>{
+      const ya=parseInt(String(a.year||'0').replace(/[^0-9]/g,''))||0;
+      const yb=parseInt(String(b.year||'0').replace(/[^0-9]/g,''))||0;
+      return yb-ya;
+    });
+  // 매체별 순서 유지해서 재조합
+  const order = ['installation','video','photography','community','painting','collage'];
+  data.works = order.flatMap(c =>
+    c === cat ? sorted : data.works.filter(w => (w.category||'installation') === c)
+  ).concat(others.filter(w => !order.includes(w.category||'installation')));
+  renderWorks();
+  toast('✓ ' + cat + ' 연도순 정렬 완료');
+}
+function addWork(cat){ data.works.push({category:cat||'installation',title:'',titleEn:'',year:'',desc:'',descEn:'',images:[]}); renderWorks(); }
+function delWork(i){ if(!confirm('이 작품을 삭제할까요?'))return; data.works.splice(i,1); renderWorks(); }
+function mvWork(i,d){ if(move(data.works,i,d))renderWorks(); }
+function addImgs(wi,input){
+  if(!input.files||!input.files.length)return;
+  const files=[...input.files]; let done=0;
+  files.forEach(f=>resizeImg(f,1600,0.88,url=>{ data.works[wi].images.push(url); if(++done===files.length)renderWorks(); }));
+}
+function rmImg(wi,ii){ data.works[wi].images.splice(ii,1); renderWorks(); }
+
+function addYT(wi){
+  const input = document.getElementById('ytInput_'+wi);
+  const url = (input && input.value || '').trim();
+  if (!url) { alert('유튜브 URL을 입력해주세요'); return; }
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+  if (!m) { alert('올바른 유튜브 URL이 아닙니다.\n예) https://youtu.be/xxxxx\n또는 https://www.youtube.com/watch?v=xxxxx'); return; }
+  data.works[wi].images.push(url);
+  renderWorks();
+}
+function mvImg(wi,ii,d){ if(move(data.works[wi].images,ii,d))renderWorks(); }
+
+/* ══════════════════
+   CV
+══════════════════ */
+function renderCV(){
+  const box=document.getElementById('cvBox'); box.innerHTML='';
+  (data.cv||[]).forEach((grp,gi)=>{
+    const entries=(grp.entries||[]).map((e,ei)=>`
+      <div class="row3" style="margin-bottom:10px;align-items:end">
+        <label class="field" style="margin:0"><span class="lbl">연도</span>
+          <input type="text" value="${esc(e.year||'')}" oninput="data.cv[${gi}].entries[${ei}].year=this.value">
+        </label>
+        <label class="field" style="margin:0"><span class="lbl">제목</span>
+          <input type="text" value="${esc(e.title||'')}" oninput="data.cv[${gi}].entries[${ei}].title=this.value">
+        </label>
+        <label class="field" style="margin:0"><span class="lbl">세부</span>
+          <div style="display:flex;gap:6px">
+            <input type="text" value="${esc(e.detail||'')}" oninput="data.cv[${gi}].entries[${ei}].detail=this.value" style="flex:1">
+            <button class="btn btn-del btn-sm" onclick="delCVEntry(${gi},${ei})">삭제</button>
+          </div>
+        </label>
+      </div>`).join('');
+    const d=document.createElement('div'); d.className='item';
+    d.innerHTML=`
+      <div class="item-head">
+        <span class="t">${esc(grp.category||'카테고리')}</span>
+        <div class="grp">
+          <button class="btn btn-move btn-sm" onclick="mvCVCat(${gi},-1)">▲</button>
+          <button class="btn btn-move btn-sm" onclick="mvCVCat(${gi},1)">▼</button>
+          <button class="btn btn-del btn-sm"  onclick="delCVCat(${gi})">삭제</button>
+        </div>
+      </div>
+      <label class="field" style="margin-bottom:14px"><span class="lbl">카테고리 이름</span>
+        <input type="text" value="${esc(grp.category||'')}" oninput="data.cv[${gi}].category=this.value">
+      </label>
+      ${entries}
+      <button class="btn btn-add btn-sm" onclick="addCVEntry(${gi})" style="margin-top:8px">+ 항목 추가</button>`;
+    box.appendChild(d);
+  });
+}
+function addCVCat(){ data.cv.push({category:'새 카테고리',entries:[{year:'',title:'',detail:''}]}); renderCV(); }
+function delCVCat(i){ if(!confirm('삭제?'))return; data.cv.splice(i,1); renderCV(); }
+function mvCVCat(i,d){ if(move(data.cv,i,d))renderCV(); }
+function addCVEntry(gi){ data.cv[gi].entries.push({year:'',title:'',detail:''}); renderCV(); }
+function delCVEntry(gi,ei){ data.cv[gi].entries.splice(ei,1); renderCV(); }
+
+/* ══════════════════
+   Exhibitions
+══════════════════ */
+function renderExhibitions(){
+  const box=document.getElementById('exBox'); box.innerHTML='';
+  (data.exhibitions||[]).forEach((x,xi)=>{
+    const opts=STATUS.map(s=>`<option value="${s[0]}"${x.status===s[0]?' selected':''}>${s[1]}</option>`).join('');
+    const d=document.createElement('div'); d.className='item';
+    d.innerHTML=`
+      <div class="item-head">
+        <span class="t">${esc(x.title||'전시 '+(xi+1))}</span>
+        <div class="grp">
+          <button class="btn btn-move btn-sm" onclick="mvEx(${xi},-1)">▲</button>
+          <button class="btn btn-move btn-sm" onclick="mvEx(${xi},1)">▼</button>
+          <button class="btn btn-del btn-sm"  onclick="delEx(${xi})">삭제</button>
+        </div>
+      </div>
+      <label class="field"><span class="lbl">기간</span>
+        <input type="text" value="${esc(x.date||'')}" oninput="data.exhibitions[${xi}].date=this.value">
+      </label>
+      <div class="row2">
+        <label class="field"><span class="lbl">전시명 (KO)</span>
+          <input type="text" value="${esc(x.title||'')}" oninput="data.exhibitions[${xi}].title=this.value">
+        </label>
+        <label class="field"><span class="lbl">전시명 (EN)</span>
+          <input type="text" value="${esc(x.titleEn||'')}" oninput="data.exhibitions[${xi}].titleEn=this.value">
+        </label>
+      </div>
+      <div class="row2">
+        <label class="field"><span class="lbl">장소</span>
+          <input type="text" value="${esc(x.venue||'')}" oninput="data.exhibitions[${xi}].venue=this.value">
+        </label>
+        <label class="field"><span class="lbl">지역</span>
+          <input type="text" value="${esc(x.location||'')}" oninput="data.exhibitions[${xi}].location=this.value">
+        </label>
+      </div>
+      <label class="field"><span class="lbl">상태</span>
+        <select onchange="data.exhibitions[${xi}].status=this.value">${opts}</select>
+      </label>`;
+    box.appendChild(d);
+  });
+}
+function addEx(){ data.exhibitions.push({date:'',title:'',titleEn:'',venue:'',location:'',status:'upcoming'}); renderExhibitions(); }
+function delEx(i){ if(!confirm('삭제?'))return; data.exhibitions.splice(i,1); renderExhibitions(); }
+function mvEx(i,d){ if(move(data.exhibitions,i,d))renderExhibitions(); }
+
+/* ══════════════════
+   저장
+══════════════════ */
+function collectArtist(){
+  A_FIELDS.forEach(f=>{ const el=document.getElementById('a_'+f); if(el&&data.artist) data.artist[f]=el.value; });
+}
+
+/* 저장 시 모아둘 이미지 파일 목록: [{name, bytes(Uint8Array)}] */
+let _pendingImages = [];
+let _imgCounter = 0;
+let _buildStamp = '';
+
+/* base64 data URI → 압축(JPEG) → Uint8Array. 이미 'images/..' 경로거나 http면 그대로 경로 반환 */
+function b64ToBytes(b64) {
+  const bin = atob(b64.split(',')[1]);
+  const len = bin.length;
+  const arr = new Uint8Array(len);
+  for (let i = 0; i < len; i++) arr[i] = bin.charCodeAt(i);
+  return arr;
+}
+
+/* data URI를 maxPx/quality로 압축한 새 data URI 반환 (resizeB64와 동일 로직) */
+function compressDataURI(b64, maxPx, quality) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxPx || h > maxPx) {
+        const r = Math.min(maxPx/w, maxPx/h);
+        w = Math.round(w*r); h = Math.round(h*r);
+      }
+      const cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      cv.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(cv.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(b64);
+    img.src = b64;
+  });
+}
+
+/* 한 장의 이미지 소스를 처리해서 저장용 경로 문자열로 변환.
+   - http(유튜브 등): 그대로 둠
+   - 이미 images/ 경로: 그대로 둠 (재저장 시 중복 생성 방지)
+   - base64: 압축 후 _pendingImages에 추가하고 'images/파일명' 반환 */
+async function srcToPath(src, maxPx, quality, prefix) {
+  if (!src) return src;
+  if (src.startsWith('http')) return src;          // 유튜브/외부 URL
+  if (src.startsWith('images/')) return src;        // 이미 분리된 파일
+  if (!src.startsWith('data:')) return src;         // 알 수 없는 형식은 보존
+  const compressed = await compressDataURI(src, maxPx, quality);
+  _imgCounter++;
+  // 고유 이름: 빌드 시각(_buildStamp) + 일련번호 → 기존 img_/full_/thumb_ 와 절대 충돌하지 않음
+  const name = 'images/up' + _buildStamp + '_' + String(_imgCounter).padStart(3, '0') + '_' + prefix + '.jpg';
+  _pendingImages.push({ name, bytes: b64ToBytes(compressed) });
+  return name;
+}
+
+async function buildNewHtml(){
+  collectArtist();
+  const clean = JSON.parse(JSON.stringify(data));
+  delete clean.__isEmbedded;
+
+  _pendingImages = [];
+  _imgCounter = 0;
+  _buildStamp = Date.now().toString(36);   // 저장할 때마다 새 고유값
+
+  // 작품 이미지: 경로(images/..) 또는 유튜브는 보존, 새 base64만 압축·파일화
+  // images → images_thumb(600px) + images_full(1200px) 두 벌의 파일 경로로 분리
+  for (const w of (clean.works || [])) {
+    if (!w.images || !w.images.length) { delete w.images; continue; }
+    const thumbs = [], fulls = [];
+    for (const src of w.images) {
+      // 유튜브/외부 URL은 thumb·full 양쪽에 동일하게 둠 (index.html 로직 호환)
+      if (src.startsWith('http')) { thumbs.push(src); fulls.push(src); continue; }
+      thumbs.push(await srcToPath(src, 600, 0.72, 'thumb'));
+      fulls.push(await srcToPath(src, 1200, 0.82, 'full'));
+    }
+    w.images_thumb = thumbs;
+    w.images_full  = fulls;
+    delete w.images;
+  }
+
+  // hero 배경 이미지도 동일 처리
+  if (clean.artist && clean.artist.heroBgImage) {
+    clean.artist.heroBgImage = await srcToPath(clean.artist.heroBgImage, 1600, 0.82, 'hero');
+  }
+
+  const SM = '/* [SITE_CONTENT_START] */';
+  const EM = '/* [SITE_CONTENT_END] */';
+  const si = indexHtml.indexOf(SM);
+  const ei = indexHtml.indexOf(EM);
+
+  if(si < 0 || ei < 0) throw new Error('마커를 찾을 수 없습니다. 올바른 index.html인지 확인해주세요.');
+
+  const block =
+    `window.__EMBEDDED_DATA__ = ${JSON.stringify(clean)};\n` +
+    `window.__EMBEDDED_DATA__.__isEmbedded = true;\n` +
+    `window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;`;
+
+  return indexHtml.slice(0, si + SM.length) + '\n' + block + '\n' + indexHtml.slice(ei);
+}
+
+function dlBlob(name, text){
+  const b=new Blob([text],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ── 최소 ZIP 생성기 (무압축 store 방식, CRC32 포함) ── */
+const _crcTable = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(bytes) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < bytes.length; i++) c = _crcTable[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function strBytes(str) { return new TextEncoder().encode(str); }
+
+/* ════════════════════════════════════════════════════════════════
+   GitHub 자동 배포
+   저장 시 변경된 파일(index.html + 새 이미지)을 GitHub 저장소에
+   커밋하면, 연결된 Netlify(youngfolio)가 push를 감지해 자동 배포합니다.
+   ════════════════════════════════════════════════════════════════ */
+const GH_CFG_KEY = 'gh_deploy_cfg_v1';
+function ghCfg(){ try { return JSON.parse(localStorage.getItem(GH_CFG_KEY)) || null; } catch(_) { return null; } }
+function ghConfigured(){ const c = ghCfg(); return !!(c && c.owner && c.repo && c.token); }
+
+/* Uint8Array → base64 (대용량 안전: 청크 단위) */
+function bytesToB64(bytes){
+  let bin = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(bin);
+}
+
+/* GitHub REST 호출 헬퍼 — 실패 시 상태코드 + 메시지 + 상세(errors[])까지 알려줌 */
+async function gh(path, method, body){
+  const c = ghCfg();
+  const res = await fetch('https://api.github.com/repos/' + c.owner + '/' + c.repo + path, {
+    method: method || 'GET',
+    headers: {
+      'Authorization': 'Bearer ' + c.token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(body ? { 'Content-Type': 'application/json' } : {})
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  let data = null;
+  try { data = await res.json(); } catch(_) {}
+  if (!res.ok) {
+    let msg = res.status + ' ' + res.statusText;
+    if (data && data.message) msg += ' — ' + data.message;
+    if (data && Array.isArray(data.errors) && data.errors.length) {
+      msg += ' [' + data.errors.map(e => (e.field ? e.field + ': ' : '') + (e.code || e.message || '')).join(' / ') + ']';
+    }
+    const err = new Error(msg);
+    err.status = res.status;
+    console.error('[GitHub]', method || 'GET', path, '→', msg);
+    throw err;
+  }
+  return data;
+}
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/* 한 파일을 Contents API로 생성/갱신 (각 파일이 자동으로 커밋됨).
+   기존 파일이면 현재 sha를 먼저 읽어와 함께 보내야 갱신됨(없으면 422).
+   GitHub 복제 지연으로 sha가 잠깐 어긋나면(409/422) 지연을 두고 여러 번 재시도. */
+async function putFile(path, bytes, message){
+  const branch  = (ghCfg().branch || 'main');
+  const url     = '/contents/' + path;
+  const content = bytesToB64(bytes);
+  const MAX = 5;
+  let lastErr = null;
+
+  for (let attempt = 0; attempt < MAX; attempt++) {
+    // 1) 최신 sha 조회 (캐시 우회용 t 파라미터). 404면 새 파일.
+    let sha = null;
+    try {
+      const cur = await gh(url + '?ref=' + encodeURIComponent(branch) + '&t=' + Date.now());
+      if (cur && cur.sha) sha = cur.sha;
+    } catch(e) {
+      if (e.status !== 404) throw e;
+    }
+
+    // 2) PUT 으로 생성/갱신
+    const body = { message, content, branch };
+    if (sha) body.sha = sha;
+    try {
+      return await gh(url, 'PUT', body);
+    } catch(e) {
+      lastErr = e;
+      // sha 불일치(409) / 검증 실패(422)는 복제 지연 가능성 → 잠시 후 최신 sha로 재시도
+      if ((e.status === 409 || e.status === 422) && attempt < MAX - 1) {
+        toast('⏳ GitHub 동기화 대기 후 재시도… (' + (attempt + 1) + ')', 60000);
+        await sleep(800 * (attempt + 1));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw lastErr;
+}
+
+/* files: [{ name:'index.html'|'images/..', bytes:Uint8Array }] */
+async function deployToGitHub(files){
+  const stamp = new Date().toLocaleString('ko-KR');
+  let i = 0;
+  for (const f of files) {
+    i++;
+    toast('📦 업로드 ' + i + '/' + files.length + ' — ' + f.name, 60000);
+    await putFile(f.name, f.bytes, '포트폴리오 업데이트 (' + f.name + ') · ' + stamp);
+  }
+  toast('✅ GitHub 푸시 완료 — Netlify가 1~2분 안에 자동 배포합니다', 8000);
+  const _btn = document.querySelector('.btn-primary');
+  if (_btn) {
+    const _orig = _btn.textContent;
+    _btn.textContent = '✓ 배포 완료!';
+    setTimeout(() => { _btn.textContent = _orig; }, 4000);
+  }
+}
+
+/* ── 설정 모달 제어 ── */
+function openGhSettings(){
+  const c = ghCfg() || {};
+  document.getElementById('ghOwner').value  = c.owner  || '';
+  document.getElementById('ghRepo').value   = c.repo   || '';
+  document.getElementById('ghBranch').value = c.branch || 'main';
+  document.getElementById('ghToken').value  = c.token  || '';
+  document.getElementById('ghModal').style.display = 'flex';
+}
+function closeGhModal(){ document.getElementById('ghModal').style.display = 'none'; }
+function saveGhCfg(){
+  const cfg = {
+    owner:  document.getElementById('ghOwner').value.trim(),
+    repo:   document.getElementById('ghRepo').value.trim(),
+    branch: document.getElementById('ghBranch').value.trim() || 'main',
+    token:  document.getElementById('ghToken').value.trim()
+  };
+  if (!cfg.owner || !cfg.repo || !cfg.token) { alert('사용자/저장소/토큰을 모두 입력해주세요.'); return; }
+  localStorage.setItem(GH_CFG_KEY, JSON.stringify(cfg));
+  closeGhModal();
+  toast('✅ GitHub 배포 설정 저장됨 — 이제 [저장 · 배포] 누르면 자동 배포됩니다');
+}
+function clearGhCfg(){
+  localStorage.removeItem(GH_CFG_KEY);
+  closeGhModal();
+  toast('GitHub 연결 해제됨 (저장 시 로컬 폴더/ZIP으로 동작)');
+}
+/* files: [{name, bytes(Uint8Array)}] → Blob(zip) */
+function makeZip(files) {
+  const chunks = [];
+  const central = [];
+  let offset = 0;
+  const enc = (n) => strBytes(n);
+  for (const f of files) {
+    const nameB = enc(f.name);
+    const crc = crc32(f.bytes);
+    const size = f.bytes.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true);
+    lh.setUint16(4, 20, true);
+    lh.setUint16(6, 0, true);
+    lh.setUint16(8, 0, true);      // store, 무압축
+    lh.setUint16(10, 0, true); lh.setUint16(12, 0, true);
+    lh.setUint32(14, crc, true);
+    lh.setUint32(18, size, true);
+    lh.setUint32(22, size, true);
+    lh.setUint16(26, nameB.length, true);
+    lh.setUint16(28, 0, true);
+    chunks.push(new Uint8Array(lh.buffer), nameB, f.bytes);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true);
+    ch.setUint16(4, 20, true); ch.setUint16(6, 20, true);
+    ch.setUint16(8, 0, true); ch.setUint16(10, 0, true);
+    ch.setUint16(12, 0, true); ch.setUint16(14, 0, true);
+    ch.setUint32(16, crc, true);
+    ch.setUint32(20, size, true); ch.setUint32(24, size, true);
+    ch.setUint16(28, nameB.length, true);
+    ch.setUint16(30, 0, true); ch.setUint16(32, 0, true);
+    ch.setUint16(34, 0, true); ch.setUint16(36, 0, true);
+    ch.setUint32(38, 0, true);
+    ch.setUint32(42, offset, true);
+    central.push({ head: new Uint8Array(ch.buffer), name: nameB });
+    offset += 30 + nameB.length + size;
+  }
+  const cStart = offset;
+  let cSize = 0;
+  for (const c of central) { chunks.push(c.head, c.name); cSize += 46 + c.name.length; }
+  const eocd = new DataView(new ArrayBuffer(22));
+  eocd.setUint32(0, 0x06054b50, true);
+  eocd.setUint16(8, files.length, true);
+  eocd.setUint16(10, files.length, true);
+  eocd.setUint32(12, cSize, true);
+  eocd.setUint32(16, cStart, true);
+  chunks.push(new Uint8Array(eocd.buffer));
+  return new Blob(chunks, { type: 'application/zip' });
+}
+
+/* 폴더 핸들에 index.html + 이미지들 직접 쓰기 (File System Access API) */
+async function writeToFolder(dirHandle, htmlText, images) {
+  // index.html
+  const idxHandle = await dirHandle.getFileHandle('index.html', { create: true });
+  let wr = await idxHandle.createWritable();
+  await wr.write(htmlText); await wr.close();
+  // images/ 하위 폴더
+  if (images.length) {
+    const imgDir = await dirHandle.getDirectoryHandle('images', { create: true });
+    for (const f of images) {
+      const fname = f.name.replace(/^images\//, '');
+      const fh = await imgDir.getFileHandle(fname, { create: true });
+      const w2 = await fh.createWritable();
+      await w2.write(f.bytes); await w2.close();
+    }
+  }
+}
+
+async function saveAll(){
+ try {
+  toast('💾 저장 시작…');
+  console.log('[saveAll] 시작', { github: ghConfigured() });
+  collectArtist();
+  let newHtml;
+  try { newHtml = await buildNewHtml(); }   // _pendingImages 채워짐
+  catch(e) { alert('저장 오류: ' + e.message); return; }
+
+  indexHtml = newHtml;
+  const images = _pendingImages;
+
+  // ── 0순위: GitHub 자동 배포 (설정돼 있으면 최우선) ──
+  if (ghConfigured()) {
+    try {
+      await deployToGitHub([{ name: 'index.html', bytes: strBytes(newHtml) }, ...images]);
+      return;
+    } catch (e) {
+      if (!confirm('GitHub 배포 실패:\n' + e.message + '\n\n대신 로컬 폴더/ZIP으로 저장할까요?')) {
+        toast('배포 취소됨');
+        return;
+      }
+      // 사용자가 동의하면 아래 기존 로컬 저장 로직으로 진행
+    }
+  }
+
+  // ── 1순위: 폴더 핸들에 자동 저장 (Chrome/Edge) ──
+  const canFolder = !!window.showDirectoryPicker;
+  if (canFolder) {
+    try {
+      if (!dirHandle) {
+        toast('저장할 프로젝트 폴더를 선택하세요 (index.html이 있는 폴더)');
+        dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+      } else {
+        const perm = await dirHandle.requestPermission({ mode: 'readwrite' });
+        if (perm !== 'granted') throw new Error('폴더 권한이 거부되었습니다.');
+      }
+      await writeToFolder(dirHandle, newHtml, images);
+      const btn = document.querySelector('.btn-primary');
+      const orig = btn.textContent;
+      btn.textContent = '✓ 저장 완료!';
+      setTimeout(() => btn.textContent = orig, 2000);
+      toast('✅ 저장 완료 — index.html + 이미지 ' + images.length + '장이 폴더에 반영됐습니다');
+      return;
+    } catch(e) {
+      if (e.name === 'AbortError') { toast('저장 취소됨'); return; }
+      // 그 외 오류 → zip 폴백으로 진행
+      dirHandle = null;
+    }
+  }
+
+  // ── 2순위: zip 다운로드 (모든 브라우저) ──
+  try {
+    const files = [{ name: 'index.html', bytes: strBytes(newHtml) }, ...images];
+    const blob = makeZip(files);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'portfolio.zip';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(a.href);
+    toast('💾 portfolio.zip 다운로드 — 압축을 풀어 기존 폴더와 교체하세요');
+  } catch(e) {
+    // 최후: html만 다운로드
+    dlBlob('index.html', newHtml);
+    toast('💾 index.html 다운로드 완료');
+  }
+ } catch (err) {
+   console.error('[saveAll] 예기치 못한 오류', err);
+   alert('저장 중 예기치 못한 오류가 발생했습니다:\n\n' + (err && err.message ? err.message : err) + '\n\n(F12 → Console 탭에 자세한 내용이 있습니다)');
+ }
+}
+</script>
+<!-- ── GitHub 자동 배포 설정 모달 ── -->
+<div id="ghModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;max-width:440px;width:90%;border-radius:14px;padding:26px 24px;font-family:'Noto Sans KR',sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <h3 style="margin:0 0 4px;font-size:17px">⚙️ GitHub 자동 배포 설정</h3>
+    <p style="margin:0 0 18px;font-size:12px;color:#666;line-height:1.6">저장하면 이 저장소로 커밋되고, 연결된 Netlify(youngfolio)가 자동으로 새 버전을 배포합니다.</p>
+    <label style="display:block;font-size:12px;color:#444;margin-bottom:10px">GitHub 사용자/조직<br><input id="ghOwner" placeholder="예: my-github-id" style="width:100%;margin-top:4px;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box"></label>
+    <label style="display:block;font-size:12px;color:#444;margin-bottom:10px">저장소 이름<br><input id="ghRepo" placeholder="예: youngfolio" style="width:100%;margin-top:4px;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box"></label>
+    <label style="display:block;font-size:12px;color:#444;margin-bottom:10px">브랜치<br><input id="ghBranch" placeholder="main" style="width:100%;margin-top:4px;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box"></label>
+    <label style="display:block;font-size:12px;color:#444;margin-bottom:6px">액세스 토큰 (Contents: Read &amp; Write 권한)<br><input id="ghToken" type="password" placeholder="github_pat_..." style="width:100%;margin-top:4px;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box"></label>
+    <p style="margin:4px 0 18px;font-size:11px;color:#999;line-height:1.5">토큰은 이 브라우저에만 저장됩니다. 공용 PC에서는 사용 후 '연결 해제'를 눌러주세요.</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="clearGhCfg()" class="btn btn-ghost" style="color:#c0392b">연결 해제</button>
+      <button onclick="closeGhModal()" class="btn btn-ghost">취소</button>
+      <button onclick="saveGhCfg()" class="btn btn-primary">저장</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
