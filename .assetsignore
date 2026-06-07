@@ -1,0 +1,7 @@
+.git
+.git/**
+.DS_Store
+.gitignore
+node_modules
+*.heic
+아카이브.zip
