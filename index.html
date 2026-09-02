@@ -444,6 +444,17 @@
       transition: background .2s, color .2s;
     }
     .btn-submit:hover { background: transparent; color: var(--ink); }
+    .btn-submit[disabled] { opacity: .45; cursor: default; }
+    .form-status {
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      min-height: 1.2em;
+      margin-top: -6px;
+    }
+    .form-status.ok  { color: var(--ink); }
+    .form-status.err { color: #a8443c; }
+    .form-status a { border-bottom: 1px solid currentColor; }
 
     /* ── Footer ── */
     footer {
@@ -515,6 +526,74 @@
       transition: background .2s, transform .2s;
     }
     .modal-dot.active { background: rgba(246,244,239,0.95); transform: scale(1.2); }
+
+    /* ── 전송 완료 팝업 ── */
+    .sent-bg {
+      display: none;
+      position: fixed; inset: 0; z-index: 400;
+      background: rgba(20,19,17,0.5);
+      backdrop-filter: blur(3px);
+      align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .sent-bg.open { display: flex; animation: sentFade .25s ease both; }
+    @keyframes sentFade { from { opacity: 0; } to { opacity: 1; } }
+    .sent-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      max-width: 420px; width: 100%;
+      padding: 44px 40px 36px;
+      text-align: center;
+      animation: sentPop .32s cubic-bezier(.2,.7,.3,1) both;
+    }
+    @keyframes sentPop { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+    .sent-check {
+      width: 46px; height: 46px; margin: 0 auto 20px;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px; color: var(--ink);
+    }
+    .sent-title {
+      font-family: var(--serif);
+      font-size: 21px; font-weight: 300;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+    .sent-text {
+      font-size: 13.5px; line-height: 1.8;
+      color: var(--ink-soft);
+      margin-bottom: 28px;
+      word-break: keep-all;
+    }
+    .sent-actions {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      justify-content: center;
+      margin: -12px 0 26px;
+    }
+    .sent-actions:empty { display: none; }
+    .sent-action {
+      font-family: var(--sans);
+      font-size: 11px; letter-spacing: 0.1em;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink-soft);
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+    .sent-action:hover { border-color: var(--ink); color: var(--ink); }
+    .sent-btn {
+      background: var(--ink); color: var(--paper);
+      border: 1px solid var(--ink);
+      font-family: var(--sans);
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      padding: 12px 34px;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .sent-btn:hover { background: transparent; color: var(--ink); }
 
     /* ── Gate (대문) ── */
     body.gate-open { overflow: hidden; }
@@ -742,18 +821,19 @@
       </div>
       <form class="contact-form" onsubmit="handleSubmit(event)">
         <div class="form-group">
-          <label id="labelName">이름 / Name</label>
-          <input type="text" id="inputName" placeholder="성함을 입력해 주세요." />
+          <label id="labelName" for="inputName">이름 / Name</label>
+          <input type="text" id="inputName" name="name" autocomplete="name" required placeholder="성함을 입력해 주세요." />
         </div>
         <div class="form-group">
-          <label id="labelEmail">이메일 / Email</label>
-          <input type="email" id="inputEmail" placeholder="your@email.com" />
+          <label id="labelEmail" for="inputEmail">이메일 / Email</label>
+          <input type="email" id="inputEmail" name="email" autocomplete="email" required placeholder="your@email.com" />
         </div>
         <div class="form-group">
-          <label id="labelMsg">메시지 / Message</label>
-          <textarea id="inputMsg" placeholder="문의 내용을 입력해 주세요."></textarea>
+          <label id="labelMsg" for="inputMsg">메시지 / Message</label>
+          <textarea id="inputMsg" name="message" required placeholder="문의 내용을 입력해 주세요."></textarea>
         </div>
         <button type="submit" class="btn-submit">Send</button>
+        <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
       </form>
     </div>
   </div>
@@ -764,6 +844,17 @@
   <span class="footer-name" id="footerName"></span>
   <span class="footer-copy" id="footerCopy"></span>
 </footer>
+
+<!-- ── 전송 완료 팝업 ── -->
+<div class="sent-bg" id="sentPopup" role="dialog" aria-modal="true" aria-labelledby="sentTitle">
+  <div class="sent-card">
+    <div class="sent-check">✓</div>
+    <h3 class="sent-title" id="sentTitle"></h3>
+    <p class="sent-text" id="sentText"></p>
+    <div class="sent-actions" id="sentActions"></div>
+    <button type="button" class="sent-btn" id="sentClose">확인</button>
+  </div>
+</div>
 
 <!-- ── Modal ── -->
 <div class="modal-bg" id="modal">
@@ -1198,12 +1289,176 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
     });
   }
 
-  /* ── Contact Form ── */
+  /* ── Contact Form ──────────────────────────────────────────────
+     페이지를 떠나지 않고 문의 메일이 바로 전송됩니다.
+     기본값은 formsubmit.co (가입 불필요, 무료).
+       · 첫 문의가 들어오면 formsubmit 이 작가 메일로 '확인' 메일을 한 번 보냅니다.
+         그 안의 버튼을 누르면 그때부터 모든 문의가 바로 메일함에 도착합니다.
+       · 다른 서비스로 바꾸려면 아래 주소만 교체하세요.
+         예) const FORM_ENDPOINT = 'https://formspree.io/f/abcdwxyz';
+       · 빈 문자열('')로 두면 방문자의 메일 앱을 여는 방식으로 돌아갑니다.
+     ────────────────────────────────────────────────────────────── */
+  const CONTACT_EMAIL = (C.artist && C.artist.email) || '';
+  const FORM_ENDPOINT = CONTACT_EMAIL ? ('https://formsubmit.co/ajax/' + CONTACT_EMAIL) : '';
+
+  const FORM_MSG = {
+    ko: {
+      empty:    '이름, 이메일, 메시지를 모두 입력해 주세요.',
+      badEmail: '이메일 주소를 다시 확인해 주세요.',
+      sending:  '보내는 중…',
+      ok:       '보내주셔서 감사합니다. 확인 후 답장 드리겠습니다.',
+      fail:     '전송에 실패했습니다. {email} 으로 보내주세요.',
+      okTitle:   '전송되었습니다',
+      failTitle: '전송하지 못했습니다',
+      mailTitle: '아래 방법으로 보내주세요',
+      mail:      '메일 내용이 준비되었습니다. 아래에서 편한 방법을 골라주세요. 주소는 {email} 입니다.'
+    },
+    en: {
+      empty:    'Please fill in your name, email and message.',
+      badEmail: 'Please check your email address.',
+      sending:  'Sending…',
+      ok:       'Thank you — I will get back to you soon.',
+      fail:     'Sending failed. Please write to {email} instead.',
+      okTitle:   'Message sent',
+      failTitle: 'Could not send',
+      mailTitle: 'Choose how to send',
+      mail:      'Your message is ready. Pick one of the options below — the address is {email}.'
+    }
+  };
+
+  function formSay(kind, text) {
+    const el = document.getElementById('formStatus');
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'form-status' + (kind ? ' ' + kind : '');
+  }
+
+  /* 전송 완료 팝업 (actions: [{label, run}] — 전송 실패 시 대안 버튼) */
+  function showSentPopup(title, text, actions) {
+    const bg = document.getElementById('sentPopup');
+    if (!bg) { alert(title + '\n\n' + text); return; }
+    document.getElementById('sentTitle').textContent = title;
+    document.getElementById('sentText').textContent  = text;
+    const box = document.getElementById('sentActions');
+    if (box) {
+      box.innerHTML = '';
+      (actions || []).forEach(a => {
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'sent-action';
+        el.textContent = a.label;
+        el.addEventListener('click', () => a.run(el));
+        box.appendChild(el);
+      });
+    }
+    const btn = document.getElementById('sentClose');
+    btn.textContent = (lang === 'en') ? 'Close' : '확인';
+    bg.classList.add('open');
+    btn.focus({ preventScroll: true });
+  }
+  function hideSentPopup() {
+    const bg = document.getElementById('sentPopup');
+    if (bg) bg.classList.remove('open');
+  }
+  (function wireSentPopup() {
+    const bg = document.getElementById('sentPopup');
+    if (!bg) return;
+    document.getElementById('sentClose').addEventListener('click', hideSentPopup);
+    bg.addEventListener('click', e => { if (e.target === bg) hideSentPopup(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && bg.classList.contains('open')) hideSentPopup();
+    });
+  })();
+
   function handleSubmit(e) {
     e.preventDefault();
-    const btn = e.target.querySelector('.btn-submit');
-    btn.textContent = 'Sent ✓'; btn.style.background = '#555';
-    setTimeout(() => { btn.textContent = 'Send →'; btn.style.background = ''; e.target.reset(); }, 2500);
+    const form = e.target;
+    const M  = FORM_MSG[lang] || FORM_MSG.ko;
+    const to = (C.artist && C.artist.email) || '';
+
+    const name  = (form.querySelector('#inputName')  || {}).value || '';
+    const email = (form.querySelector('#inputEmail') || {}).value || '';
+    const msg   = (form.querySelector('#inputMsg')   || {}).value || '';
+    const n = name.trim(), em = email.trim(), ms = msg.trim();
+
+    if (!n || !em || !ms) { formSay('err', M.empty); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { formSay('err', M.badEmail); return; }
+
+    const btn  = form.querySelector('.btn-submit');
+    const site = location.hostname || (C.artist && (C.artist.nameEn || C.artist.nameKo)) || 'website';
+    const subject = '[' + site + '] ' + n + (lang === 'en' ? ' — inquiry' : ' 님의 문의');
+    const bodyText = ms + '\n\n---\n' + n + ' <' + em + '>';
+
+    /* 메일 앱 / Gmail / 복사 — 전송이 막혔을 때의 대안 */
+    function fallbackActions() {
+      const mailHref = 'mailto:' + to
+        + '?subject=' + encodeURIComponent(subject)
+        + '&body='    + encodeURIComponent(bodyText);
+      const gmailHref = 'https://mail.google.com/mail/?view=cm&fs=1'
+        + '&to='   + encodeURIComponent(to)
+        + '&su='   + encodeURIComponent(subject)
+        + '&body=' + encodeURIComponent(bodyText);
+      const isEn = lang === 'en';
+      return [
+        { label: isEn ? 'Open Gmail' : 'Gmail로 보내기',
+          run: () => window.open(gmailHref, '_blank', 'noopener') },
+        { label: isEn ? 'Mail app' : '메일 앱으로 열기',
+          run: () => { window.location.href = mailHref; } },
+        { label: isEn ? 'Copy message' : '내용 복사',
+          run: (el) => {
+            const txt = to + '\n' + subject + '\n\n' + bodyText;
+            const done = () => { el.textContent = isEn ? 'Copied ✓' : '복사됨 ✓'; };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(txt).then(done).catch(() => {});
+            } else {
+              const ta = document.createElement('textarea');
+              ta.value = txt; document.body.appendChild(ta); ta.select();
+              try { document.execCommand('copy'); done(); } catch (e) {}
+              document.body.removeChild(ta);
+            }
+          } }
+      ];
+    }
+
+    /* 1) 기본 : 페이지를 떠나지 않고 바로 전송 */
+    if (FORM_ENDPOINT) {
+      btn.disabled = true;
+      formSay('', M.sending);
+
+      const isFormSubmit = FORM_ENDPOINT.indexOf('formsubmit.co') !== -1;
+      const opts = isFormSubmit
+        ? { method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+              name: n, email: em, message: ms,
+              _subject: subject,
+              _template: 'table',
+              _captcha: 'false'
+            }) }
+        : { method: 'POST', headers: { 'Accept': 'application/json' }, body: new FormData(form) };
+
+      fetch(FORM_ENDPOINT, opts)
+        .then(res => res.json().catch(() => ({})).then(j => ({ res: res, json: j })))
+        .then(({ res, json }) => {
+          if (!res.ok || json.success === 'false' || json.success === false) {
+            throw new Error(json.message || ('HTTP ' + res.status));
+          }
+          formSay('ok', M.ok);
+          form.reset();
+          showSentPopup(M.okTitle, M.ok);
+        })
+        .catch(err => {
+          console.error('[site] form send failed:', err);
+          formSay('err', M.fail.replace('{email}', to));
+          showSentPopup(M.failTitle, M.fail.replace('{email}', to), fallbackActions());
+        })
+        .then(() => { btn.disabled = false; });
+      return;
+    }
+
+    /* 2) 폼 서비스를 쓰지 않을 때 : 메일 앱 / Gmail / 복사 */
+    formSay('ok', M.mail.replace('{email}', to));
+    showSentPopup(M.mailTitle, M.mail.replace('{email}', to), fallbackActions());
   }
 
   /* ── Nav active scroll ── */
