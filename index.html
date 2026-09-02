@@ -8,474 +8,665 @@
   <title>Younghwan Choi · 최영환</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@200;300;400;500&family=Noto+Serif+KR:wght@200;300&display=swap" rel="stylesheet">
   <style>
     /* ── Reset & Base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     a { text-decoration: none; color: inherit; }
     :root {
-      --black: #0a0a0a;
-      --gray: #555555;
-      --gray-soft: #777777;
-      --light: #e0e0e0;
-      --bg: #fafafa;
+      --ink: #1a1a18;
+      --ink-soft: #6f6d67;
+      --line: #ded9d1;
+      --line-soft: #ebe7e0;
+      --paper: #f6f4ef;
+      --paper-2: #efece5;
       --white: #ffffff;
-      --font-serif: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-      --font-sans:  'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-      --recent-work: #d4cfc9;
-      --hero-bg-image: none;
+      /* 제목 계열은 명조 (Noto Serif KR), 본문은 고딕 */
+      --serif: 'Noto Serif KR', 'Apple SD Gothic Neo', serif;
+      --sans: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      --font-serif: var(--serif);
+      --font-sans: var(--sans);
+      --pad: 56px;
     }
     html { scroll-behavior: smooth; }
     body {
-      background-color: var(--bg);
-      color: var(--black);
-      font-family: var(--font-sans);
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
       font-size: 15px;
       font-weight: 300;
-      line-height: 1.7;
+      line-height: 1.75;
       -webkit-font-smoothing: antialiased;
     }
+    ::selection { background: var(--ink); color: var(--paper); }
+    img { max-width: 100%; }
 
     /* ── Nav ── */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(255,255,255,0.94);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--light);
+      background: rgba(246,244,239,0.88);
+      backdrop-filter: blur(10px);
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 48px;
-      height: 60px;
+      padding: 0 var(--pad);
+      height: 64px;
+      border-bottom: 1px solid transparent;
+      transition: border-color .3s;
     }
+    nav.scrolled { border-bottom-color: var(--line); }
     .nav-name {
-      font-family: var(--font-serif);
-      font-size: 17px;
-      letter-spacing: 0.02em;
-      color: var(--black);
+      font-family: var(--serif);
+      font-size: 16px;
+      font-weight: 300;
+      letter-spacing: 0.06em;
+      color: var(--ink);
       white-space: nowrap;
       flex-shrink: 0;
     }
-    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links { display: flex; align-items: center; gap: 30px; list-style: none; }
     .nav-links a {
-      text-decoration: none;
-      font-size: 13px;
-      letter-spacing: 0.08em;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--gray);
-      transition: color 0.2s;
+      color: var(--ink-soft);
+      padding-bottom: 3px;
+      border-bottom: 1px solid transparent;
+      transition: color .2s, border-color .2s;
     }
-    .nav-links a:hover { color: var(--black); }
+    .nav-links a:hover, .nav-links a.on { color: var(--ink); border-bottom-color: var(--ink); }
 
-    /* ── Sections ── */
-    section { padding: 100px 48px; max-width: 1100px; margin: 0 auto; }
-    #portfolio { max-width: 100%; padding-left: 48px; padding-right: 48px; }
-    @media (max-width: 768px) {
-      #portfolio { padding-left: 0; padding-right: 0; }
+    /* 언어 전환 */
+    .nav-lang { display: flex; align-items: center; gap: 8px; margin-left: 6px; }
+    .lang-btn {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--sans);
+      font-size: 10px; font-weight: 400;
+      letter-spacing: 0.14em;
+      color: #b0aba2;
+      padding: 3px 2px;
+      transition: color .2s;
     }
-    /* 배경이 비쳐 보이도록 — 각 섹션 콘텐츠는 흰색 반투명 블록으로 처리 */
-    #cv, #portfolio, #exhibitions, #contact {
-      background: rgba(250,250,250,0.88);
-      backdrop-filter: blur(2px);
-    }
-    section:first-of-type { padding-top: 160px; }
+    .lang-btn:hover { color: var(--ink); }
+    .lang-btn.active { color: var(--ink); }
+    .nav-lang .lang-btn + .lang-btn { border-left: 1px solid var(--line); padding-left: 10px; }
 
-    /* ── Hero ── */
-    #hero {
-      min-height: 90vh;
-      display: flex; flex-direction: column; justify-content: center;
-      padding-top: 120px;
-      border-bottom: 1px solid var(--light);
-      position: relative;
-      /* 전체 너비 채우기 */
-      max-width: 100%;
-      width: 100%;
-      margin-left: 0;
-      margin-right: 0;
-      background-image: var(--hero-bg-image);
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
+    /* ── Side Nav ── */
+    .side-nav {
+      position: fixed; right: 26px; top: 50%;
+      transform: translateY(-50%);
+      z-index: 90;
+      display: flex; flex-direction: column;
+      align-items: flex-end; gap: 14px;
     }
-    #hero::before {
-      content: '';
-      position: absolute; top: 0; bottom: 0;
-      left: 50%; transform: translateX(-50%);
-      width: 100vw; z-index: -1;
-      background: linear-gradient(rgba(10,10,10,0.45), rgba(10,10,10,0.55));
+    .side-nav a { display: flex; flex-direction: row-reverse; align-items: center; gap: 10px; }
+    .side-nav .sn-num {
+      font-size: 9px; letter-spacing: 0.14em;
+      color: #b6b1a8;
+      transition: color .25s;
+    }
+    .side-nav .sn-label {
+      font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink-soft);
+      opacity: 0; transform: translateX(6px);
+      transition: opacity .25s, transform .25s, color .25s;
+    }
+    .side-nav a:hover .sn-label { opacity: 1; transform: none; }
+    .side-nav a:hover .sn-num { color: var(--ink); }
+    .side-nav a.active .sn-num { color: var(--ink); }
+    .side-nav a.active .sn-label { opacity: 1; transform: none; color: var(--ink); }
+    .sn-top {
+      background: none; border: none; cursor: pointer;
+      display: flex; flex-direction: row-reverse; align-items: center; gap: 10px;
+      margin-bottom: 8px; padding: 0;
+      font-family: var(--sans);
+    }
+    .sn-top-icon { font-size: 12px; color: #b6b1a8; transition: color .25s; }
+    .sn-top-label {
+      font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink-soft);
+      opacity: 0; transform: translateX(6px);
+      transition: opacity .25s, transform .25s;
+    }
+    .sn-top:hover .sn-top-icon { color: var(--ink); }
+    .sn-top:hover .sn-top-label { opacity: 1; transform: none; }
+
+    /* ── Layout ── */
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--pad); }
+    section { padding: 110px 0; }
+    .rule { height: 1px; background: var(--line-soft); max-width: 1180px; margin: 0 auto; }
+
+    /* 대문 다음 바로 포트폴리오 */
+    #portfolio { padding-top: 132px; }
+
+    /* ── Intro (미사용 · 마크업 복구 시 대비) ── */
+    #top { padding: 0; }
+    #intro { padding-top: 152px; padding-bottom: 92px; }
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 64px;
+      align-items: end;
     }
     .hero-label {
-      font-size: 11px; letter-spacing: 0.2em;
-      text-transform: uppercase; color: rgba(255,255,255,0.75); margin-bottom: 24px;
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 26px;
     }
     .hero-name {
-      font-family: var(--font-serif);
-      font-size: clamp(30px, 4.5vw, 52px);
-      font-weight: 300; line-height: 1.15;
-      letter-spacing: -0.02em; margin-bottom: 32px;
-      color: #ffffff;
+      font-family: var(--serif);
+      font-weight: 200;
+      font-size: clamp(38px, 5.4vw, 68px);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
     }
-    .hero-name .name-ko,
-    .hero-name .name-en { font-size: 1em; line-height: 1.15; }
-    .hero-bio {
-      font-size: 16px;
-      color: rgba(255,255,255,0.85); line-height: 1.8; margin-bottom: 48px;
-    }
-    .hero-cta {
-      display: inline-block;
-      font-size: 12px; letter-spacing: 0.12em;
-      text-transform: uppercase; color: #ffffff;
-      padding-bottom: 2px; border-bottom: 1px solid rgba(255,255,255,0.5);
-      transition: opacity 0.2s;
-    }
-    .hero-cta:hover { opacity: 0.5; }
-
-    /* ── Section Title ── */
-    .section-header {
-      display: flex; align-items: baseline; gap: 20px;
-      margin-bottom: 60px;
-      padding-bottom: 20px;
-    }
-    .section-title { font-family: var(--font-serif); font-size: 32px; font-weight: 400; }
-    .section-num { font-size: 11px; letter-spacing: 0.15em; color: var(--gray); }
-
-    /* ── CV ── */
-    .cv-grid { display: grid; grid-template-columns: 180px 1fr; gap: 0; }
-    .cv-category {
-      font-size: 11px; letter-spacing: 0.15em;
-      text-transform: uppercase; color: #666;
-      font-weight: 400;
-      padding-top: 2px; padding-bottom: 40px;
-      line-height: 1.6;
-    }
-    .cv-entries { padding-bottom: 40px; margin-bottom: 40px; }
-    .cv-entry {
-      display: grid; grid-template-columns: 80px 1fr;
-      gap: 16px; margin-bottom: 20px;
-    }
-    .cv-entry:last-child { margin-bottom: 0; }
-    .cv-year { font-size: 13px; color: #888; padding-top: 1px; font-weight: 300; }
-    .cv-title { font-size: 15px; font-weight: 300; color: #222; }
-    .cv-detail { font-size: 13px; color: #888; margin-top: 3px; }
-
-    /* ── Gallery ── */
-    .gallery-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 48px; }
-    .filter-btn {
-      font-size: 12px; letter-spacing: 0.1em;
+    .hero-name .name-en {
+      display: block;
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: clamp(11px, 1.3vw, 15px);
+      letter-spacing: 0.3em;
       text-transform: uppercase;
-      background: none; border: none; cursor: pointer;
-      color: var(--gray); padding: 6px 14px;
-      border-radius: 6px;
-      transition: all 0.2s;
+      color: var(--ink-soft);
+      margin-top: 20px;
     }
-    .filter-btn:hover { color: var(--black); }
-    .filter-btn.active { color: var(--black); font-weight: 500; background: #dcdcdc; }
-    .gallery-grid { display: block; }
-    .gallery-group { margin-bottom: 72px; }
+    .hero-bio {
+      font-size: 15px;
+      color: var(--ink-soft);
+      line-height: 2;
+      max-width: 460px;
+      border-left: 1px solid var(--line);
+      padding-left: 28px;
+    }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex; align-items: baseline; gap: 18px;
+      margin-bottom: 50px;
+    }
+    .section-num { font-size: 10px; letter-spacing: 0.2em; color: var(--ink-soft); }
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(26px, 3vw, 38px);
+      font-weight: 200;
+      letter-spacing: -0.01em;
+    }
+    .section-title small {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-left: 14px;
+      vertical-align: middle;
+    }
+
+    /* ── Works ── */
+    .gallery-filter { display: flex; gap: 9px; margin-bottom: 52px; flex-wrap: wrap; }
+    .filter-btn {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+      color: var(--ink-soft);
+      padding: 7px 17px;
+      transition: all .2s;
+    }
+    .filter-btn:hover { border-color: var(--ink-soft); color: var(--ink); }
+    .filter-btn.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+
+    .gallery-group { margin-bottom: 84px; }
     .gallery-group:last-child { margin-bottom: 0; }
     .gallery-group-h {
-      font-family: var(--font-serif);
-      font-size: 13px; font-weight: 500;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--gray); margin: 0 0 24px;
-      padding-bottom: 10px; border-bottom: 1px solid var(--light);
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink);
+      padding-bottom: 14px;
+      margin-bottom: 34px;
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: baseline; gap: 10px;
     }
-    .gallery-group-h .g-count { color: var(--gray-soft); font-weight: 300; margin-left: 10px; }
+    .gallery-group-h .g-count {
+      font-size: 10px; letter-spacing: 0.08em;
+      color: var(--ink-soft);
+    }
     .gallery-grid-inner {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 36px 26px;
     }
-    @media (max-width: 1200px) {
-      .gallery-grid-inner { grid-template-columns: repeat(4, 1fr); }
+    .gallery-item { cursor: pointer; }
+    .g-frame {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1;
+      background: var(--paper-2);
     }
-    @media (max-width: 900px) {
-      .gallery-grid-inner { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-      .gallery-group { margin-bottom: 56px; }
-    }
-    @media (max-width: 600px) {
-      .gallery-grid-inner { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    }
-    @media (max-width: 1024px) {    }
-    @media (max-width: 768px) {
-          }
-    .gallery-item {
-      position: relative; overflow: hidden;
-      aspect-ratio: 1; background: #ece8e1; cursor: pointer;
-      border-radius: 3px;
-    }
-    .gallery-item img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.6s ease; }
-    .gallery-item:hover img { transform: scale(1.04); }
-    .gallery-overlay {
+    .g-frame::after {
+      content: '';
       position: absolute; inset: 0;
-      background: rgba(17,17,17,0.7);
-      display: flex; flex-direction: column;
-      justify-content: flex-end;
-      padding: 24px; opacity: 0; transition: opacity 0.3s;
+      border: 1px solid rgba(0,0,0,0.06);
+      pointer-events: none;
     }
-    .gallery-item:hover .gallery-overlay { opacity: 1; }
-    .gallery-overlay .g-title { color: #fff; font-size: 15px; font-weight: 500; }
-    .gallery-overlay .g-year { color: #fff; font-size: 12px; margin-top: 4px; }
-    .gallery-item.ph-1 { background: #d4cfc9; }
-    .gallery-item.ph-2 { background: #c9cdd4; }
-    .gallery-item.ph-3 { background: #d4c9c9; }
-    .gallery-item.ph-4 { background: #c9d4cd; }
-    .gallery-item.ph-5 { background: #d4d2c9; }
-    .gallery-item.ph-6 { background: #cbc9d4; }
-    .gallery-empty { color: var(--gray); font-size: 14px; padding: 20px 0; }
+    .gallery-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .8s cubic-bezier(.2,.7,.3,1);
+    }
+    .gallery-item:hover img { transform: scale(1.04); }
+    .g-view {
+      position: absolute; left: 0; bottom: 0;
+      background: var(--ink); color: var(--paper);
+      font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+      padding: 8px 14px;
+      opacity: 0; transform: translateY(6px);
+      transition: opacity .3s, transform .3s;
+    }
+    .gallery-item:hover .g-view { opacity: 1; transform: translateY(0); }
+    .g-count-badge {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(20,19,17,0.72);
+      color: #f6f4ef;
+      font-size: 10px; letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+    .g-meta {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 14px; margin-top: 14px;
+    }
+    .g-title { font-size: 15px; font-weight: 300; letter-spacing: -0.01em; line-height: 1.5; }
+    .g-year { font-size: 11px; letter-spacing: 0.1em; color: var(--ink-soft); white-space: nowrap; }
+    .g-desc {
+      font-size: 12px; color: var(--ink-soft); line-height: 1.65;
+      margin-top: 5px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .yt-play-icon {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: rgba(20,19,17,0.6);
+      color: #fff; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      padding-left: 3px;
+      transition: background .25s;
+      pointer-events: none;
+    }
+    .gallery-item:hover .yt-play-icon { background: rgba(20,19,17,0.82); }
+    .gallery-item.ph-1 .g-frame { background: linear-gradient(160deg,#ded8d0,#cdc6bd); }
+    .gallery-item.ph-2 .g-frame { background: linear-gradient(160deg,#d3d7dc,#c2c7ce); }
+    .gallery-item.ph-3 .g-frame { background: linear-gradient(160deg,#dfd2cf,#cec0bc); }
+    .gallery-item.ph-4 .g-frame { background: linear-gradient(160deg,#d0d9d3,#bfc9c2); }
+    .gallery-item.ph-5 .g-frame { background: linear-gradient(160deg,#dedbcd,#ccc8b9); }
+    .gallery-item.ph-6 .g-frame { background: linear-gradient(160deg,#d3cfda,#c1bcc9); }
+    .gallery-empty { color: var(--ink-soft); font-size: 14px; padding: 20px 0; }
+
+    /* ── CV ── */
+    .cv-grid {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 40px;
+      padding: 32px 0;
+      border-top: 1px solid var(--line-soft);
+    }
+    .cv-grid:last-child { border-bottom: 1px solid var(--line-soft); }
+    .cv-category {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink);
+      position: sticky; top: 96px;
+      align-self: start;
+    }
+    .cv-entries { }
+    .cv-entry {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      gap: 20px;
+      padding: 10px 0;
+    }
+    .cv-entry:last-child { padding-bottom: 0; }
+    .cv-year { font-size: 12px; color: var(--ink-soft); letter-spacing: 0.06em; padding-top: 3px; }
+    .cv-title { font-size: 15px; font-weight: 300; }
+    .cv-detail { font-size: 13px; color: var(--ink-soft); margin-top: 1px; }
 
     /* ── Exhibitions ── */
     .exhibition-list { display: flex; flex-direction: column; }
     .exhibition-item {
-      display: grid; grid-template-columns: 120px 1fr auto;
-      align-items: start; gap: 32px;
-      padding: 32px 0; border-bottom: 1px solid var(--light);
+      display: grid;
+      grid-template-columns: 150px 1fr auto;
+      align-items: start;
+      gap: 36px;
+      padding: 28px 0;
+      border-top: 1px solid var(--line-soft);
     }
-    .ex-date { font-size: 13px; color: #888; padding-top: 3px; line-height: 1.6; font-weight: 300; }
-    .ex-title { font-size: 18px; font-weight: 300; margin-bottom: 6px; color: #222; }
-    .ex-venue { font-size: 13px; color: #888; }
-    .ex-location { font-size: 12px; color: #999; margin-top: 2px; }
+    .exhibition-item:last-child { border-bottom: 1px solid var(--line-soft); }
+    .exhibition-item.is-current { background: var(--paper-2); padding-left: 24px; padding-right: 24px; }
+    .ex-date { font-size: 12px; color: var(--ink-soft); letter-spacing: 0.06em; padding-top: 6px; }
+    .ex-title { font-family: var(--serif); font-size: 20px; font-weight: 300; margin-bottom: 5px; letter-spacing: -0.01em; }
+    .ex-venue { font-size: 13.5px; color: var(--ink); }
+    .ex-location { font-size: 12.5px; color: var(--ink-soft); margin-top: 1px; }
     .ex-badge {
-      font-size: 10px; letter-spacing: 0.12em;
-      text-transform: uppercase; padding: 4px 10px;
-      border-radius: 20px; white-space: nowrap; margin-top: 4px;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 999px;
+      white-space: nowrap;
+      margin-top: 6px;
     }
-    .ex-badge.current  { background: #111; color: #fff; }
-    .ex-badge.upcoming { background: transparent; border: 1px solid #111; color: #111; }
-    .ex-badge.past     { background: var(--light); color: var(--gray); }
+    .ex-badge.current { background: var(--ink); color: var(--paper); }
+    .ex-badge.upcoming { background: transparent; border: 1px solid var(--ink); color: var(--ink); }
+    .ex-badge.past { background: transparent; border: 1px solid var(--line); color: var(--ink-soft); }
 
     /* ── Contact ── */
     .contact-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 80px; align-items: start;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 88px;
+      align-items: start;
     }
     .contact-text {
-      font-family: var(--font-serif);
-      font-size: 28px; font-weight: 300;
-      line-height: 1.4; margin-bottom: 40px;
-      color: #333;
+      font-family: var(--serif);
+      font-size: clamp(21px, 2.3vw, 29px);
+      font-weight: 200;
+      line-height: 1.55;
+      margin-bottom: 38px;
     }
-    .contact-links { display: flex; flex-direction: column; gap: 16px; }
+    .contact-links { display: flex; flex-direction: column; }
     .contact-link {
-      display: flex; align-items: center; gap: 16px;
-      text-decoration: none; color: var(--black); font-size: 14px;
+      display: flex; align-items: center; gap: 20px;
+      color: var(--ink);
+      font-size: 14px;
+      padding: 14px 0;
+      border-top: 1px solid var(--line-soft);
     }
+    .contact-links .contact-link:last-child { border-bottom: 1px solid var(--line-soft); }
     .contact-link-label {
-      width: 80px; font-size: 11px;
-      letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray);
+      width: 90px;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
     }
-    .contact-link-val { transition: opacity 0.2s; }
-    .contact-link:hover .contact-link-val { opacity: 0.6; }
-    .contact-form { display: flex; flex-direction: column; gap: 24px; }
+    .contact-link-val { border-bottom: 1px solid transparent; transition: border-color .2s; }
+    .contact-link:hover .contact-link-val { border-color: var(--ink); }
+
+    .contact-form { display: flex; flex-direction: column; gap: 22px; }
     .form-group { display: flex; flex-direction: column; gap: 8px; }
     .form-group label {
-      font-size: 11px; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--gray);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
     }
-    .form-group input, .form-group textarea {
-      border: none; border-bottom: 1px solid var(--light);
-      background: transparent; padding: 10px 0;
-      font-size: 14px; font-family: var(--font-sans);
-      color: var(--black); outline: none;
-      transition: border-color 0.2s; resize: none;
+    .form-group input,
+    .form-group textarea {
+      border: none;
+      border-bottom: 1px solid var(--line);
+      background: transparent;
+      padding: 11px 0;
+      font-size: 14px;
+      font-family: var(--sans);
+      font-weight: 300;
+      color: var(--ink);
+      outline: none;
+      transition: border-color .2s;
+      resize: none;
     }
-    .form-group input:focus, .form-group textarea:focus { border-color: var(--black); }
-    .form-group textarea { min-height: 100px; }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: #b6b1a8; }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--ink); }
+    .form-group textarea { min-height: 96px; }
     .btn-submit {
       align-self: flex-start;
-      background: var(--black); color: var(--white);
-      border: none; padding: 14px 36px;
-      font-size: 12px; letter-spacing: 0.12em;
-      text-transform: uppercase; cursor: pointer;
-      font-family: var(--font-sans);
-      transition: opacity 0.2s;
+      background: var(--ink);
+      color: var(--paper);
+      border: 1px solid var(--ink);
+      padding: 13px 34px;
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, color .2s;
     }
-    .btn-submit:hover { opacity: 0.75; }
+    .btn-submit:hover { background: transparent; color: var(--ink); }
 
     /* ── Footer ── */
     footer {
-      border-top: 1px solid var(--light);
-      padding: 40px 48px; max-width: 1100px; margin: 0 auto;
-      display: flex; justify-content: space-between; align-items: center;
+      border-top: 1px solid var(--line);
+      padding: 36px var(--pad);
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
     }
-    .footer-name { font-family: var(--font-serif); font-size: 15px; }
-    .footer-copy { font-size: 12px; color: var(--gray); }
+    .footer-name { font-family: var(--serif); font-size: 14px; letter-spacing: 0.04em; }
+    .footer-copy { font-size: 11px; color: var(--ink-soft); letter-spacing: 0.06em; }
 
     /* ── Modal ── */
     .modal-bg {
-      display: none; position: fixed; inset: 0; z-index: 200;
-      background: rgba(10,10,10,0.92);
+      display: none;
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(20,19,17,0.95);
       align-items: center; justify-content: center;
     }
     .modal-bg.open { display: flex; }
-    .modal-inner { position: relative; width: 100%; }
-    .modal-img { width: 100%; max-height: 80vh; object-fit: contain; display: block; }
-    .modal-video-wrap { position: relative; width: 100%; padding-top: 56.25%; background: #000; }
-    .modal-video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
-    .yt-play-icon {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 52px; height: 52px; background: rgba(0,0,0,0.65); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 20px; pointer-events: none;
-    }
-    .gallery-item { position: relative; }
+    .modal-wrap { position: relative; width: 100%; display: flex; align-items: center; justify-content: center; }
+    .modal-inner { position: relative; max-width: 1000px; width: 88%; }
+    .modal-img { width: 100%; max-height: 76vh; object-fit: contain; display: block; margin: 0 auto; }
+    .modal-video-wrap { position: relative; width: 100%; padding-top: 56.25%; }
+    .modal-video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
     .modal-ph {
-      background: #222; width: 100%; aspect-ratio: 1;
+      background: #2a2825; width: 100%; aspect-ratio: 4/3;
       display: flex; align-items: center; justify-content: center;
-      color: #555; font-size: 14px; letter-spacing: 0.1em;
+      color: #6b6862; font-size: 11px; letter-spacing: 0.24em;
     }
     .modal-caption {
-      color: rgba(255,255,255,0.7); font-size: 13px;
-      margin-top: 16px; text-align: center;
-    }
-    .modal-wrap {
-      position: relative;
-      max-width: 860px; width: 90%;
+      color: rgba(246,244,239,0.72);
+      font-size: 12.5px;
+      letter-spacing: 0.03em;
+      line-height: 1.7;
+      margin-top: 16px;
+      text-align: center;
     }
     .modal-close {
-      position: absolute; top: -36px; right: 0;
+      position: fixed; top: 26px; right: 32px;
       background: none; border: none;
-      color: #fff; font-size: 26px; cursor: pointer; line-height: 1;
-      width: 36px; height: 36px; border-radius: 4px;
-      display: flex; align-items: center; justify-content: center;
-      transition: opacity 0.2s; z-index: 201; opacity: 0.85;
+      color: rgba(246,244,239,0.7); font-size: 30px; cursor: pointer; line-height: 1;
+      transition: color .2s;
+      z-index: 210;
     }
-    .modal-close:hover { opacity: 1; }
+    .modal-close:hover { color: #fff; }
     .modal-arrow {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
-      color: #fff; font-size: 20px; cursor: pointer;
-      width: 48px; height: 48px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s; z-index: 201;
-      user-select: none;
+      position: absolute; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: rgba(246,244,239,0.6);
+      font-size: 26px; cursor: pointer;
+      padding: 16px;
+      transition: color .2s;
+      z-index: 205;
     }
-    .modal-arrow:hover { background: rgba(255,255,255,0.28); }
-    .modal-arrow-prev { left: -70px; }
-    .modal-arrow-next { right: -70px; }
-    .modal-arrow.hidden { opacity: 0; pointer-events: none; }
-    .modal-dots {
-      display: flex; justify-content: center; gap: 6px; margin-top: 12px;
-    }
+    .modal-arrow:hover { color: #fff; }
+    .modal-arrow-prev { left: -58px; }
+    .modal-arrow-next { right: -58px; }
+    .modal-arrow.hidden { display: none; }
+    .modal-dots { display: flex; justify-content: center; gap: 7px; margin-top: 18px; }
     .modal-dot {
       width: 6px; height: 6px; border-radius: 50%;
-      background: rgba(255,255,255,0.3); cursor: pointer; transition: background 0.2s;
+      background: rgba(246,244,239,0.3);
+      cursor: pointer;
+      transition: background .2s, transform .2s;
     }
-    .modal-dot.active { background: #fff; }
-    @media (max-width: 768px) {
-      .modal-arrow-prev { left: -54px; }
-      .modal-arrow-next { right: -54px; }
-      .modal-close { top: 16px; right: 16px; }
-    }
+    .modal-dot.active { background: rgba(246,244,239,0.95); transform: scale(1.2); }
 
-    .nav-lang {
-      display: flex; gap: 4px; align-items: center; margin-left: 32px;
+    /* ── Gate (대문) ── */
+    body.gate-open { overflow: hidden; }
+    #gate {
+      position: fixed; inset: 0; z-index: 500;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      cursor: pointer;
+      background: #171614;
+      overflow: hidden;
+      transition: opacity .9s ease, visibility .9s;
     }
-    .lang-btn {
-      background: none; border: none; cursor: pointer;
-      font-size: 11px; letter-spacing: 0.1em;
-      font-family: var(--font-sans);
-      color: var(--gray); padding: 4px 7px;
-      border-radius: 3px;
-      transition: all 0.2s;
+    #gate.closing { opacity: 0; visibility: hidden; }
+    .gate-bg {
+      position: absolute; inset: 0;
+      background-color: var(--gate-tint, #b9b2a8);
+      background-image: var(--gate-art, none);
+      background-size: cover;
+      background-position: center;
+      animation: gateZoom 10s ease-out forwards;
     }
-    .lang-btn.active {
-      color: var(--black);
-      font-weight: 500;
-      background: rgba(0,0,0,0.06);
+    @keyframes gateZoom { from { transform: scale(1.10); } to { transform: scale(1.0); } }
+    .gate-veil {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(15,14,13,0.44), rgba(15,14,13,0.16) 38%, rgba(15,14,13,0.64));
     }
-    .lang-btn:hover { color: var(--black); }
-    .side-nav {
-      position: fixed;
-      top: 50%;
-      right: 32px;
-      transform: translateY(-50%);
-      z-index: 50;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+    .gate-inner {
+      position: relative; z-index: 2;
+      text-align: center;
+      color: #f6f4ef;
+      padding: 0 24px;
+      animation: gateIn 1.4s cubic-bezier(.2,.7,.3,1) both;
     }
-    .sn-top {
-      background: none; border: none; cursor: pointer;
-      font-family: var(--font-sans);
-      display: flex; align-items: center; gap: 14px;
-      color: #777; font-size: 11px; letter-spacing: 0.12em;
-      text-transform: uppercase; padding: 0;
-      transition: color 0.25s;
-      margin-bottom: 6px;
-    }
-    .sn-top:hover { color: #222; }
-    .sn-top-icon {
-      font-size: 13px; line-height: 1;
-    }
-    .sn-top-label {
-      opacity: 0; transform: translateX(-6px);
-      transition: opacity 0.25s, transform 0.25s;
-    }
-    .sn-top:hover .sn-top-label {
-      opacity: 1; transform: translateX(0);
-    }
-    .side-nav a {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      color: #777;
-      font-size: 11px;
-      letter-spacing: 0.12em;
+    @keyframes gateIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+    .gate-label {
+      font-size: 10px;
+      letter-spacing: 0.32em;
       text-transform: uppercase;
-      transition: color 0.25s;
+      color: rgba(246,244,239,0.72);
+      margin-bottom: 26px;
     }
-    .side-nav .sn-num {
+    .gate-name-ko {
+      font-family: var(--serif);
+      font-weight: 200;
+      font-size: clamp(44px, 8vw, 104px);
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+      text-shadow: 0 2px 40px rgba(0,0,0,0.3);
+    }
+    .gate-name-en {
+      display: block;
+      font-family: var(--sans);
       font-weight: 300;
-      width: 18px;
+      font-size: clamp(11px, 1.3vw, 15px);
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(246,244,239,0.82);
+      margin-top: 22px;
+      padding-left: 0.4em;
     }
-    .side-nav .sn-label {
-      opacity: 0;
-      transform: translateX(-6px);
-      transition: opacity 0.25s, transform 0.25s;
+    .gate-work {
+      position: absolute; left: 0; right: 0; bottom: 84px;
+      z-index: 2; text-align: center;
+      font-size: 11px; letter-spacing: 0.12em;
+      color: rgba(246,244,239,0.6);
+      padding: 0 24px;
+      animation: gateIn 1.8s cubic-bezier(.2,.7,.3,1) both;
     }
-    .side-nav a:hover { color: #222; }
-    .side-nav a:hover .sn-label {
-      opacity: 1;
-      transform: translateX(0);
+    .gate-enter {
+      position: absolute; left: 0; right: 0; bottom: 40px;
+      z-index: 2; text-align: center;
+      font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(246,244,239,0.85);
+      animation: gatePulse 2.6s ease-in-out infinite;
     }
-    .side-nav a.active { color: #111; }
-    .side-nav a.active .sn-num { font-weight: 500; }
-    .side-nav a.active .sn-label {
-      opacity: 1;
-      transform: translateX(0);
-    }
+    @keyframes gatePulse { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
+
+    /* ── Reveal ── */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity: 1; transform: none; }
 
     /* ── Responsive ── */
-    @media (max-width: 768px) {
-      nav { padding: 0 16px; }
-      .nav-name { font-size: 13px; letter-spacing: 0.01em; }
-      .nav-links { gap: 14px; }
-      section { padding: 80px 24px; }
-      .cv-grid { grid-template-columns: 1fr; }
-      .cv-category { padding-bottom: 8px; }      .exhibition-item { grid-template-columns: 1fr; gap: 8px; }
-      .contact-grid { grid-template-columns: 1fr; gap: 48px; }
-      footer { flex-direction: column; gap: 8px; text-align: center; }
-      .side-nav { display: none; }
+    @media (max-width: 1200px) { .side-nav { display: none; } }
+    @media (max-width: 1100px) {
+      .gallery-grid-inner { grid-template-columns: repeat(3, 1fr); }
     }
-    @media (max-width: 1240px) {
-      .side-nav { right: 16px; }
+    @media (max-width: 780px) {
+      .gallery-grid-inner { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 480px) {
-      .nav-name { font-size: 12px; }
-      .nav-links { gap: 10px; }
-      .nav-links a { font-size: 11px; letter-spacing: 0.04em; }
-      nav { padding: 0 12px; }
+    @media (max-width: 900px) {
+      :root { --pad: 24px; }
+      .intro-grid { grid-template-columns: 1fr; gap: 32px; align-items: start; }
+      .hero-bio { border-left: none; padding-left: 0; border-top: 1px solid var(--line); padding-top: 24px; }
+      .cv-grid { grid-template-columns: 1fr; gap: 12px; }
+      .cv-category { position: static; }
+      .exhibition-item { grid-template-columns: 1fr; gap: 10px; }
+      .contact-grid { grid-template-columns: 1fr; gap: 56px; }
+      footer { flex-direction: column; text-align: center; }
+      .modal-arrow-prev { left: -8px; }
+      .modal-arrow-next { right: -8px; }
+      .modal-inner { width: 92%; }
+    }
+    @media (max-width: 640px) {
+      section { padding: 76px 0; }
+      #portfolio { padding-top: 96px; }
+      #intro { padding-top: 118px; padding-bottom: 56px; }
+      .gallery-grid-inner { grid-template-columns: repeat(2, 1fr); gap: 26px 16px; }
+      .g-desc { display: none; }
+      nav { padding: 0 18px; height: 56px; }
+      .nav-name { font-size: 14px; }
+      .nav-links { gap: 13px; }
+      .nav-links a { font-size: 9.5px; letter-spacing: 0.05em; }
+      .lang-btn { font-size: 9px; letter-spacing: 0.06em; }
+      .nav-lang { gap: 6px; margin-left: 0; }
+      .nav-lang .lang-btn + .lang-btn { padding-left: 7px; }
+      .gate-work { bottom: 76px; font-size: 10px; }
+      .gate-enter { bottom: 34px; }
+    }
+    @media (max-width: 560px) {
+      .nav-name { display: none; }
+      .nav-links { width: 100%; justify-content: space-between; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .gate-bg { animation: none; }
+      .gate-inner, .gate-work { animation: none; }
+      .gate-enter { animation: none; opacity: .8; }
+      .reveal { transition: none; opacity: 1; transform: none; }
     }
   </style>
 </head>
-<body>
+
+<body class="gate-open">
+
+<!-- ── Gate · 대문 (가장 최근 작품 전체화면) ── -->
+<div id="gate" role="button" tabindex="0" aria-label="사이트 입장">
+  <div class="gate-bg" id="gateBg"></div>
+  <div class="gate-veil"></div>
+  <div class="gate-inner">
+    <p class="gate-label" id="gateLabel"></p>
+    <h1 class="gate-name-ko" id="gateNameKo"></h1>
+    <span class="gate-name-en" id="gateNameEn"></span>
+  </div>
+  <p class="gate-work" id="gateWork"></p>
+  <p class="gate-enter">Click to enter</p>
+</div>
 
 <!-- ── Navigation ── -->
-<nav>
-  <a class="nav-name" href="#hero" id="navName">최영환</a>
+<nav id="nav">
+  <a class="nav-name" href="#portfolio" id="navName">최영환</a>
   <ul class="nav-links">
-    <li><a href="#cv">CV</a></li>
     <li><a href="#portfolio">Works</a></li>
+    <li><a href="#cv">CV</a></li>
     <li><a href="#exhibitions">Exhibitions</a></li>
     <li><a href="#contact">Contact</a></li>
     <li class="nav-lang">
@@ -491,77 +682,80 @@
     <span class="sn-top-icon">↑</span>
     <span class="sn-top-label">Top</span>
   </button>
-  <a href="#cv"><span class="sn-num">01</span><span class="sn-label">CV</span></a>
-  <a href="#portfolio"><span class="sn-num">02</span><span class="sn-label">Works</span></a>
+  <a href="#portfolio"><span class="sn-num">01</span><span class="sn-label">Works</span></a>
+  <a href="#cv"><span class="sn-num">02</span><span class="sn-label">CV</span></a>
   <a href="#exhibitions"><span class="sn-num">03</span><span class="sn-label">Exhibitions</span></a>
   <a href="#contact"><span class="sn-num">04</span><span class="sn-label">Contact</span></a>
 </aside>
 
-<!-- ── Hero ── -->
-<section id="hero">
-  <p class="hero-label" id="heroLabel"></p>
-  <h1 class="hero-name">
-    <span class="name-ko" id="heroNameKo"></span><br>
-    <span class="name-en" id="heroNameEn"></span>
-  </h1>
-  <p class="hero-bio" id="heroBio"></p>
-  <a class="hero-cta" href="#portfolio" id="heroCta">작품 보기 →</a>
-</section>
-
-<!-- ── CV ── -->
-<section id="cv">
-  <div class="section-header">
-    <span class="section-num">01</span>
-    <h2 class="section-title">CV</h2>
-  </div>
-  <div id="cvContainer"></div>
-</section>
-
-<!-- ── Portfolio ── -->
+<!-- ── 01 Portfolio (대문 다음 바로 시작) ── -->
 <section id="portfolio">
-  <div class="section-header">
-    <span class="section-num">02</span>
-    <h2 class="section-title">Works</h2>
-  </div>
-  <div class="gallery-filter" id="galleryFilter"></div>
-  <div id="galleryGrid" class="gallery-grid"></div>
-</section>
-
-<!-- ── Exhibitions ── -->
-<section id="exhibitions">
-  <div class="section-header">
-    <span class="section-num">03</span>
-    <h2 class="section-title">Exhibitions</h2>
-  </div>
-  <div class="exhibition-list" id="exhibitionList"></div>
-</section>
-
-<!-- ── Contact ── -->
-<section id="contact">
-  <div class="section-header">
-    <span class="section-num">04</span>
-    <h2 class="section-title">Contact</h2>
-  </div>
-  <div class="contact-grid">
-    <div>
-      <p class="contact-text" id="contactText"></p>
-      <div class="contact-links" id="contactLinks"></div>
+  <div class="wrap">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Works<small id="secWorks">포트폴리오</small></h2>
     </div>
-    <form class="contact-form" onsubmit="handleSubmit(event)">
-      <div class="form-group">
-        <label id="labelName">이름 / Name</label>
-        <input type="text" id="inputName" placeholder="Your name" />
+    <div class="gallery-filter" id="galleryFilter"></div>
+    <div id="galleryGrid" class="gallery-grid"></div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ── 02 CV ── -->
+<section id="cv">
+  <div class="wrap">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">CV<small id="secCv">약력</small></h2>
+    </div>
+    <div id="cvContainer"></div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ── 03 Exhibitions ── -->
+<section id="exhibitions">
+  <div class="wrap">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Exhibitions<small id="secEx">전시 소식</small></h2>
+    </div>
+    <div class="exhibition-list" id="exhibitionList"></div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ── 04 Contact ── -->
+<section id="contact">
+  <div class="wrap">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Contact<small id="secContact">문의</small></h2>
+    </div>
+    <div class="contact-grid">
+      <div>
+        <p class="contact-text" id="contactText"></p>
+        <div class="contact-links" id="contactLinks"></div>
       </div>
-      <div class="form-group">
-        <label id="labelEmail">이메일 / Email</label>
-        <input type="email" id="inputEmail" placeholder="your@email.com" />
-      </div>
-      <div class="form-group">
-        <label id="labelMsg">메시지 / Message</label>
-        <textarea id="inputMsg" placeholder="문의 내용을 입력해 주세요."></textarea>
-      </div>
-      <button type="submit" class="btn-submit">Send →</button>
-    </form>
+      <form class="contact-form" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label id="labelName">이름 / Name</label>
+          <input type="text" id="inputName" placeholder="성함을 입력해 주세요." />
+        </div>
+        <div class="form-group">
+          <label id="labelEmail">이메일 / Email</label>
+          <input type="email" id="inputEmail" placeholder="your@email.com" />
+        </div>
+        <div class="form-group">
+          <label id="labelMsg">메시지 / Message</label>
+          <textarea id="inputMsg" placeholder="문의 내용을 입력해 주세요."></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Send</button>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -573,14 +767,15 @@
 
 <!-- ── Modal ── -->
 <div class="modal-bg" id="modal">
-  <div class="modal-wrap">
   <button class="modal-close" id="modalClose">×</button>
-  <div class="modal-inner">
-    <button class="modal-arrow modal-arrow-prev hidden" id="modalPrev">&#8592;</button>
-    <button class="modal-arrow modal-arrow-next hidden" id="modalNext">&#8594;</button>
-    <div id="modalContent"></div>
-    <div class="modal-dots" id="modalDots"></div>
-    <p class="modal-caption" id="modalCaption"></p>
+  <div class="modal-wrap">
+    <div class="modal-inner">
+      <button class="modal-arrow modal-arrow-prev hidden" id="modalPrev">&#8592;</button>
+      <button class="modal-arrow modal-arrow-next hidden" id="modalNext">&#8594;</button>
+      <div id="modalContent"></div>
+      <div class="modal-dots" id="modalDots"></div>
+      <p class="modal-caption" id="modalCaption"></p>
+    </div>
   </div>
 </div>
 
@@ -592,6 +787,7 @@ window.__EMBEDDED_DATA__.__isEmbedded = true;
 window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
 /* [SITE_CONTENT_END] */
 </script>
+
 <script>
   let C = window.SITE_CONTENT || { artist:{}, cv:[], works:[], exhibitions:[] };
   let lang = 'ko';
@@ -639,19 +835,31 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
     if (el('inputMsg'))  el('inputMsg').placeholder  = isEn ? 'Please enter your message.' : '문의 내용을 입력해 주세요.';
     if (el('inputName')) el('inputName').placeholder = isEn ? 'Your name' : '성함을 입력해 주세요.';
 
+    if (el('secWorks'))   el('secWorks').textContent   = isEn ? 'Portfolio' : '포트폴리오';
+    if (el('secCv'))      el('secCv').textContent      = isEn ? 'Curriculum Vitae' : '약력';
+    if (el('secEx'))      el('secEx').textContent      = isEn ? 'News' : '전시 소식';
+    if (el('secContact')) el('secContact').textContent = isEn ? 'Get in touch' : '문의';
+
     renderArtist();
     renderCV();
+    renderWorks();
     renderExhibitions();
+    if (document.getElementById('gate')) gateTexts();
   }
 
   /* ── 작가 정보 ── */
   function renderArtist() {
     const a = C.artist || {};
     document.getElementById('navName').textContent    = lang === 'en' ? (a.nameEn||a.nameKo||'') : (a.nameKo||a.nameEn||'');
-    document.getElementById('heroLabel').textContent  = a.label || '';
-    document.getElementById('heroNameKo').textContent = a.nameKo || '';
-    document.getElementById('heroNameEn').textContent = a.nameEn || '';
-    document.getElementById('heroBio').innerHTML     = nl2br(t(a, 'bio'));
+    const set = (id, val, html) => {
+      const n = document.getElementById(id);
+      if (!n) return;                 // 인트로 섹션을 쓰지 않을 때
+      if (html) n.innerHTML = val; else n.textContent = val;
+    };
+    set('heroLabel',  a.label || '');
+    set('heroNameKo', a.nameKo || '');
+    set('heroNameEn', a.nameEn || '');
+    set('heroBio',    nl2br(t(a, 'bio')), true);
     document.getElementById('contactText').innerHTML  = nl2br(t(a, 'contactText'));
     document.title = (a.nameEn || a.nameKo || 'Artist') + ' · ' + (a.nameEn || '');
 
@@ -671,23 +879,62 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
     document.getElementById('footerCopy').textContent = t(a, 'footer');
   }
 
-  /* ── Hero 배경 ── */
-  function renderHeroBg() {
+  /* ── 연도 파싱 : "2012-2013", "2020 –" 등에서 가장 늦은 연도 ── */
+  function yearNum(w) {
+    const ms = String((w && w.year) || '').match(/\d{4}/g);
+    return ms ? Math.max(...ms.map(Number)) : 0;
+  }
+
+  /* ── Gate (대문) : 가장 최근 작품 이미지 전체화면 ── */
+  function gateTexts() {
     const a = C.artist || {};
-    // 1) artist.heroBgImage 우선
-    if (a.heroBgImage) {
-      document.documentElement.style.setProperty('--hero-bg-image', `url("${a.heroBgImage}")`);
-      return;
+    document.getElementById('gateLabel').textContent  = a.label || '';
+    document.getElementById('gateNameKo').textContent = lang === 'en' ? (a.nameEn || a.nameKo || '') : (a.nameKo || a.nameEn || '');
+    document.getElementById('gateNameEn').textContent = lang === 'en' ? '' : (a.nameEn || '');
+    const w = _gateWork;
+    if (w) {
+      document.getElementById('gateWork').textContent =
+        [t(w, 'title'), w.year].filter(Boolean).join(', ');
     }
-    // 2) 없으면 최신 작품 첫 이미지
-    const works = C.works || [];
-    if (!works.length) return;
-    let recent = works[0];
-    works.forEach(w => { if (parseInt(w.year||0,10) > parseInt(recent.year||0,10)) recent = w; });
-    const imgs = recent ? (recent.images && recent.images.length ? recent.images : (recent.image ? [recent.image] : [])) : [];
-    if (imgs.length > 0) {
-      document.documentElement.style.setProperty('--hero-bg-image', `url("${imgs[0]}")`);
+  }
+
+  let _gateWork = null;
+  function renderGate() {
+    const gate = document.getElementById('gate');
+    if (!gate) return;
+    const a = C.artist || {};
+
+    /* 가장 최근 작품(연도 내림차순) 중 이미지가 있는 첫 작품 */
+    const works = [...(C.works || [])].sort((x, y) => yearNum(y) - yearNum(x));
+    let art = '';
+    for (const w of works) {
+      const imgs = getImages(w);
+      const src = imgs.find(u => u && !isYT(u));
+      if (src) { art = src; _gateWork = w; break; }
     }
+    /* 작품 이미지가 하나도 없으면 artist.heroBgImage 사용 */
+    if (!art && a.heroBgImage) art = a.heroBgImage;
+
+    const bg = document.getElementById('gateBg');
+    if (art) {
+      bg.style.setProperty('--gate-art', 'url("' + art + '")');
+      const pre = new Image(); pre.src = art;
+    }
+    gateTexts();
+
+    let closed = false;
+    function enter() {
+      if (closed) return;
+      closed = true;
+      gate.classList.add('closing');
+      document.body.classList.remove('gate-open');
+      setTimeout(() => { if (gate.parentNode) gate.remove(); }, 950);
+    }
+    gate.addEventListener('click', enter);
+    gate.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') enter(); });
+    gate.addEventListener('wheel', enter, { passive: true });
+    gate.addEventListener('touchmove', enter, { passive: true });
+    try { gate.focus({ preventScroll: true }); } catch (e) {}
   }
 
   /* ── CV ── */
@@ -704,7 +951,7 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
           </div>
         </div>`).join('');
       box.innerHTML += `
-        <div class="cv-grid">
+        <div class="cv-grid reveal">
           <div class="cv-category">${esc(group.category)}</div>
           <div class="cv-entries">${entries}</div>
         </div>`;
@@ -727,11 +974,7 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
     const filterBar = document.getElementById('galleryFilter');
     grid.innerHTML = '';
 
-    const works = [...(C.works || [])].sort((a, b) => {
-      const ya = parseInt(String(a.year || '0').replace(/[^0-9]/g, '')) || 0;
-      const yb = parseInt(String(b.year || '0').replace(/[^0-9]/g, '')) || 0;
-      return yb - ya;
-    });
+    const works = [...(C.works || [])].sort((a, b) => yearNum(b) - yearNum(a));
     if (!works.length) { grid.innerHTML = '<p class="gallery-empty">No works registered.</p>'; return; }
 
     // 고정 메뉴 4개: Installation / Video / Drawing / Painting
@@ -765,14 +1008,18 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
       const isYTThumb = thumbRaw && isYT(thumbRaw);
       item.className = 'gallery-item' + (thumbSrc ? '' : ' ph-' + ((i % 6) + 1));
       item.dataset.cat = w.category || '';
-      const yearLine = [w.year, cap(w.category), w.desc].filter(Boolean).join(' · ');
+      const nImg = getImages(w).length;
       item.innerHTML =
-        (thumbSrc ? `<img src="${esc(thumbSrc)}" alt="${esc(w.title)}" loading="lazy">` : '') +
+        '<div class="g-frame">' +
+        (thumbSrc ? `<img src="${esc(thumbSrc)}" alt="${esc(t(w,'title'))}" loading="lazy">` : '') +
         (isYTThumb ? `<div class="yt-play-icon">▶</div>` : '') +
-        `<div class="gallery-overlay">
-           <span class="g-title">${esc(w.title)}</span>
-           <span class="g-year">${esc(yearLine)}</span>
-         </div>`;
+        (nImg > 1 ? `<span class="g-count-badge">${nImg}</span>` : '') +
+        `<span class="g-view">View</span></div>` +
+        `<div class="g-meta">
+           <span class="g-title">${esc(t(w,'title'))}</span>
+           <span class="g-year">${esc(w.year || '')}</span>
+         </div>` +
+        (t(w,'desc') ? `<p class="g-desc">${esc(t(w,'desc'))}</p>` : '');
       item.addEventListener('click', () => openModal(w));
       return item;
     }
@@ -792,7 +1039,7 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
     cats.forEach(c => {
       if (_activeFilter !== 'all' && c !== _activeFilter) return;
       const sec = document.createElement('div');
-      sec.className = 'gallery-group';
+      sec.className = 'gallery-group reveal';
       const h = document.createElement('h3');
       h.className = 'gallery-group-h';
       h.innerHTML = `${esc(catLabel(c))}<span class="g-count">${groups[c].length}</span>`;
@@ -803,6 +1050,7 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
       sec.appendChild(inner);
       grid.appendChild(sec);
     });
+    if (typeof wireReveal === 'function') wireReveal();
   }
   function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
@@ -811,14 +1059,17 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
     ko: { current:'진행 중', upcoming:'예정', past:'종료' },
     en: { current:'Current', upcoming:'Upcoming', past:'Past' }
   };
+  const STATUS_ORDER = { current: 0, upcoming: 1, past: 2 };
   function renderExhibitions() {
     const list = document.getElementById('exhibitionList');
     list.innerHTML = '';
-    (C.exhibitions || []).forEach(ex => {
+    const items = [...(C.exhibitions || [])].sort((a, b) =>
+      (STATUS_ORDER[a.status || 'past'] ?? 3) - (STATUS_ORDER[b.status || 'past'] ?? 3));
+    items.forEach(ex => {
       const st  = ex.status || 'past';
       const lbl = (STATUS_LABEL[lang] || STATUS_LABEL.ko)[st] || st;
       list.innerHTML += `
-        <div class="exhibition-item">
+        <div class="exhibition-item reveal${st === 'current' ? ' is-current' : ''}">
           <div class="ex-date">${nl2br(ex.date)}</div>
           <div class="ex-info">
             <div class="ex-title">${esc(t(ex,'title'))}</div>
@@ -897,8 +1148,8 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
     }
 
     // 캡션
-    let cap = [w.title, w.year].filter(Boolean).join(', ');
-    if (w.desc) cap += '  ·  ' + w.desc;
+    let cap = [t(w,'title'), w.year].filter(Boolean).join(', ');
+    if (t(w,'desc')) cap += '  ·  ' + t(w,'desc');
     if (imgs.length > 1) cap += `  (${idx+1}/${imgs.length})`;
     document.getElementById('modalCaption').textContent = cap;
   }
@@ -957,28 +1208,55 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
 
   /* ── Nav active scroll ── */
   function wireScroll() {
+    const nav = document.getElementById('nav');
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-links a');
     const sideLinks = document.querySelectorAll('.side-nav a');
-    window.addEventListener('scroll', () => {
+    function onScroll() {
+      if (nav) nav.classList.toggle('scrolled', window.scrollY > 12);
       let current = '';
-      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
-      navLinks.forEach(a => { a.style.color = a.getAttribute('href') === '#' + current ? '#111' : ''; });
-      sideLinks.forEach(a => {
-        if (a.getAttribute('href') === '#' + current) a.classList.add('active');
-        else a.classList.remove('active');
-      });
-    });
+      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+      navLinks.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + current));
+      sideLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  /* ── Reveal on scroll ──
+     어떤 이유로든 관찰이 실패해도 내용은 반드시 보이도록 안전장치를 둔다 */
+  function showAllReveal() {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+  }
+  function wireReveal() {
+    try {
+      const els = document.querySelectorAll('.reveal:not(.in)');
+      if (!('IntersectionObserver' in window)) { showAllReveal(); return; }
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(en => {
+          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+        });
+      }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
+      els.forEach(el => io.observe(el));
+      setTimeout(showAllReveal, 2500);   // 안전장치
+    } catch (e) {
+      showAllReveal();
+    }
   }
 
   /* ── Init ── */
-  renderArtist();
-  renderHeroBg();
-  renderCV();
-  renderWorks();
-  renderExhibitions();
-  wireFilter();
-  wireScroll();
+  /* 한 단계가 실패해도 나머지 화면은 그려지도록 각각 보호 */
+  function run(fn, name) {
+    try { fn(); } catch (e) { console.error('[site] ' + name + ' failed:', e); }
+  }
+  run(renderGate, 'gate');
+  run(renderArtist, 'artist');
+  run(renderWorks, 'works');
+  run(renderCV, 'cv');
+  run(renderExhibitions, 'exhibitions');
+  run(wireFilter, 'filter');
+  run(wireScroll, 'scroll');
+  run(wireReveal, 'reveal');
 </script>
 </body>
 </html>
