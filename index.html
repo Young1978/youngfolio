@@ -1308,8 +1308,10 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
       sending:  '보내는 중…',
       ok:       '보내주셔서 감사합니다. 확인 후 답장 드리겠습니다.',
       fail:     '전송에 실패했습니다. {email} 으로 보내주세요.',
-      okTitle:   '전송되었습니다',
-      failTitle: '전송하지 못했습니다',
+      okTitle:      '전송되었습니다',
+      failTitle:    '전송하지 못했습니다',
+      pendingTitle: '문의가 접수되었습니다',
+      pending:      '메시지가 정상적으로 접수되었습니다. 작가가 확인하는 대로 답장 드리겠습니다.',
       mailTitle: '아래 방법으로 보내주세요',
       mail:      '메일 내용이 준비되었습니다. 아래에서 편한 방법을 골라주세요. 주소는 {email} 입니다.'
     },
@@ -1319,8 +1321,10 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
       sending:  'Sending…',
       ok:       'Thank you — I will get back to you soon.',
       fail:     'Sending failed. Please write to {email} instead.',
-      okTitle:   'Message sent',
-      failTitle: 'Could not send',
+      okTitle:      'Message sent',
+      failTitle:    'Could not send',
+      pendingTitle: 'Message received',
+      pending:      'Your message has been received. The artist will get back to you soon.',
       mailTitle: 'Choose how to send',
       mail:      'Your message is ready. Pick one of the options below — the address is {email}.'
     }
@@ -1440,8 +1444,18 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
       fetch(FORM_ENDPOINT, opts)
         .then(res => res.json().catch(() => ({})).then(j => ({ res: res, json: j })))
         .then(({ res, json }) => {
+          const note = String(json.message || '');
+          /* 아직 활성화 전(첫 전송) : 작가 메일함의 확인 메일을 눌러야 한다.
+             방문자에게는 실패가 아니라 '접수됨'으로 안내한다. */
+          if (/confirm|activat/i.test(note)) {
+            formSay('ok', M.pending);
+            form.reset();
+            showSentPopup(M.pendingTitle, M.pending);
+            console.info('[site] formsubmit: 확인 메일이 ' + to + ' 로 발송되었습니다. 링크를 눌러 활성화하세요.');
+            return;
+          }
           if (!res.ok || json.success === 'false' || json.success === false) {
-            throw new Error(json.message || ('HTTP ' + res.status));
+            throw new Error(note || ('HTTP ' + res.status));
           }
           formSay('ok', M.ok);
           form.reset();
