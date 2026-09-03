@@ -480,11 +480,26 @@
     .modal-bg.open { display: flex; }
     .modal-wrap { position: relative; width: 100%; display: flex; align-items: center; justify-content: center; }
     .modal-inner { position: relative; max-width: 1000px; width: 88%; }
-    .modal-img { width: 100%; max-height: 76vh; object-fit: contain; display: block; margin: 0 auto; }
-    .modal-video-wrap { position: relative; width: 100%; padding-top: 56.25%; }
+    /* 이미지 실제 크기에 딱 맞는 상자 — 닫기 버튼이 이미지 모서리에 붙도록 */
+    .modal-stage {
+      position: relative;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto;
+      line-height: 0;
+    }
+    .modal-img {
+      max-width: 100%;
+      max-height: 76vh;
+      width: auto; height: auto;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+    .modal-video-wrap { position: relative; width: min(88vw, 1000px); padding-top: 56.25%; }
     .modal-video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
     .modal-ph {
-      background: #2a2825; width: 100%; aspect-ratio: 4/3;
+      background: #2a2825; width: min(70vw, 520px); aspect-ratio: 4/3;
       display: flex; align-items: center; justify-content: center;
       color: #6b6862; font-size: 11px; letter-spacing: 0.24em;
     }
@@ -497,13 +512,24 @@
       text-align: center;
     }
     .modal-close {
-      position: fixed; top: 26px; right: 32px;
-      background: none; border: none;
-      color: rgba(246,244,239,0.7); font-size: 30px; cursor: pointer; line-height: 1;
-      transition: color .2s;
+      position: absolute; top: 10px; right: 10px;
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(20,19,17,0.55);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(246,244,239,0.25);
+      border-radius: 50%;
+      color: rgba(246,244,239,0.9);
+      font-size: 20px; line-height: 1;
+      cursor: pointer;
+      transition: background .2s, color .2s, border-color .2s;
       z-index: 210;
     }
-    .modal-close:hover { color: #fff; }
+    .modal-close:hover {
+      background: rgba(20,19,17,0.85);
+      border-color: rgba(246,244,239,0.6);
+      color: #fff;
+    }
     .modal-arrow {
       position: absolute; top: 50%;
       transform: translateY(-50%);
@@ -858,12 +884,14 @@
 
 <!-- ── Modal ── -->
 <div class="modal-bg" id="modal">
-  <button class="modal-close" id="modalClose">×</button>
   <div class="modal-wrap">
     <div class="modal-inner">
       <button class="modal-arrow modal-arrow-prev hidden" id="modalPrev">&#8592;</button>
       <button class="modal-arrow modal-arrow-next hidden" id="modalNext">&#8594;</button>
-      <div id="modalContent"></div>
+      <div class="modal-stage">
+        <div id="modalContent"></div>
+        <button class="modal-close" id="modalClose" aria-label="닫기">×</button>
+      </div>
       <div class="modal-dots" id="modalDots"></div>
       <p class="modal-caption" id="modalCaption"></p>
     </div>
