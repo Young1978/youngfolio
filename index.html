@@ -273,14 +273,6 @@
       transition: opacity .3s, transform .3s;
     }
     .gallery-item:hover .g-view { opacity: 1; transform: translateY(0); }
-    .g-count-badge {
-      position: absolute; top: 10px; right: 10px;
-      background: rgba(20,19,17,0.72);
-      color: #f6f4ef;
-      font-size: 10px; letter-spacing: 0.06em;
-      padding: 3px 8px;
-      border-radius: 999px;
-    }
     .g-meta {
       display: flex; align-items: baseline; justify-content: space-between;
       gap: 14px; margin-top: 14px;
@@ -1296,12 +1288,10 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
       const isYTThumb = thumbRaw && isYT(thumbRaw);
       item.className = 'gallery-item' + (thumbSrc ? '' : ' ph-' + ((i % 6) + 1));
       item.dataset.cat = w.category || '';
-      const nImg = getImages(w).length;
       item.innerHTML =
         '<div class="g-frame">' +
         (thumbSrc ? `<img src="${esc(thumbSrc)}" alt="${esc(t(w,'title'))}" loading="lazy">` : '') +
         (isYTThumb ? `<div class="yt-play-icon">▶</div>` : '') +
-        (nImg > 1 ? `<span class="g-count-badge">${nImg}</span>` : '') +
         `<span class="g-view">View</span></div>` +
         `<div class="g-meta">
            <span class="g-title">${esc(t(w,'title'))}</span>
