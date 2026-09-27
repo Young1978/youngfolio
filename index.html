@@ -1413,25 +1413,44 @@ window.SITE_OPTIONS = {
 
       /* 실제로 재생이 시작됐을 때만 영상을 보여줌.
          자동재생이 막히면(재생 버튼·제목이 뜨는 상태) 영상은 숨기고 작품 사진을 그대로 둔다. */
-      let showTimer = null;
+      let showTimer = null, heard = false, handshake = null;
       const send = obj => { try { f.contentWindow.postMessage(JSON.stringify(obj), '*'); } catch (e) {} };
+      const reveal = delay => {
+        if (showTimer || box.classList.contains('show')) return;
+        showTimer = setTimeout(() => box.classList.add('show'), delay);
+      };
       window.addEventListener('message', e => {
-        if (!/youtube(-nocookie)?\.com$/.test(new URL(e.origin).hostname)) return;
+        let host = '';
+        try { host = new URL(e.origin).hostname; } catch (err) { return; }
+        if (!/youtube(-nocookie)?\.com$/.test(host)) return;
         let d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (err) { return; }
-        const st = d && d.info && typeof d.info.playerState === 'number' ? d.info.playerState
-                 : (d && d.event === 'onStateChange' ? d.info : null);
-        if (st === 1) {                       // 재생 중 → 곧바로 표시 (유튜브 제목 줄은 확대로 화면 밖에 잘라냄)
-          if (!showTimer && !box.classList.contains('show'))
-            showTimer = setTimeout(() => box.classList.add('show'), 400);
-        } else if (st === 2 || st === -1 || st === 5) {   // 멈춤/시작 전 → 숨김
+        if (!d) return;
+        if (!heard) {                         // 플레이어와 연결됨 → 재생 명령
+          heard = true;
+          clearInterval(handshake);
+          send({ event: 'command', func: 'mute', args: [] });
+          send({ event: 'command', func: 'playVideo', args: [] });
+        }
+        const st = d.info && typeof d.info.playerState === 'number' ? d.info.playerState
+                 : (d.event === 'onStateChange' ? d.info : null);
+        if (st === 1) {
+          reveal(300);                        // 재생 중 → 곧바로 표시 (제목 줄은 확대로 잘라냄)
+        } else if (st === 2 || st === 5) {    // 멈춤 / 재생 대기(자동재생 막힘) → 사진 유지
           clearTimeout(showTimer); showTimer = null;
           box.classList.remove('show');
         }
       });
+      /* 유튜브 플레이어가 준비될 때까지 연결 신호를 반복해서 보냄
+         (한 번만 보내면 플레이어가 준비되기 전에 사라져 영상이 끝내 안 나올 수 있음) */
       f.addEventListener('load', () => {
-        send({ event: 'listening', id: 1, channel: 'widget' });
-        send({ event: 'command', func: 'mute', args: [] });
-        send({ event: 'command', func: 'playVideo', args: [] });
+        let tries = 0;
+        clearInterval(handshake);
+        handshake = setInterval(() => {
+          if (heard || ++tries > 40) return clearInterval(handshake);
+          send({ event: 'listening', id: 1, channel: 'widget' });
+        }, 250);
+        /* 끝내 연결 신호를 못 받으면(차단된 환경 등) 5초 뒤 그냥 영상을 보여줌 */
+        setTimeout(() => { if (!heard) reveal(0); }, 5000);
       });
     } else {
       const v = document.createElement('video');
