@@ -1401,7 +1401,9 @@ window.SITE_OPTIONS = {
 
     if (isYT(src)) {
       const id = ytId(src);
-      const q = 'autoplay=1&mute=1&loop=1&playlist=' + id +
+      /* loop/playlist 를 쓰면 유튜브가 좌우 화살표(이전·다음)를 띄우므로
+         반복은 아래에서 직접 처음으로 되감아 처리 */
+      const q = 'autoplay=1&mute=1' +
                 '&controls=0&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&fs=0' +
                 '&enablejsapi=1&origin=' + encodeURIComponent(location.origin);
       const f = document.createElement('iframe');
@@ -1433,8 +1435,18 @@ window.SITE_OPTIONS = {
         }
         const st = d.info && typeof d.info.playerState === 'number' ? d.info.playerState
                  : (d.event === 'onStateChange' ? d.info : null);
+        /* 끝나기 직전에 처음으로 되감기 → 끝 화면(다시보기 버튼)이 뜨지 않음 */
+        if (d.info && typeof d.info.currentTime === 'number' && typeof d.info.duration === 'number' &&
+            d.info.duration > 2 && d.info.currentTime > d.info.duration - 0.6) {
+          send({ event: 'command', func: 'seekTo', args: [0, true] });
+        }
+        if (st === 0) {                       // 혹시 끝까지 가면 바로 처음부터
+          send({ event: 'command', func: 'seekTo', args: [0, true] });
+          send({ event: 'command', func: 'playVideo', args: [] });
+          return;
+        }
         if (st === 1) {
-          reveal(300);                        // 재생 중 → 곧바로 표시 (제목 줄은 확대로 잘라냄)
+          reveal(700);                        // 재생 중 → 재생 버튼이 걷힌 뒤 표시 (제목 줄은 확대로 잘라냄)
         } else if (st === 2 || st === 5) {    // 멈춤 / 재생 대기(자동재생 막힘) → 사진 유지
           clearTimeout(showTimer); showTimer = null;
           box.classList.remove('show');
@@ -1450,7 +1462,7 @@ window.SITE_OPTIONS = {
           send({ event: 'listening', id: 1, channel: 'widget' });
         }, 250);
         /* 끝내 연결 신호를 못 받으면(차단된 환경 등) 5초 뒤 그냥 영상을 보여줌 */
-        setTimeout(() => { if (!heard) reveal(0); }, 5000);
+        setTimeout(() => { if (!heard) reveal(0); }, 6000);
       });
     } else {
       const v = document.createElement('video');
