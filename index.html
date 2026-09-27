@@ -370,6 +370,14 @@
       margin-top: 12px;
     }
     .featured-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.8; padding-top: 8px; }
+    /* 대표작 모서리의 Play video 버튼 (누르면 영상 재생) */
+    .f-video-btn {
+      pointer-events: auto; cursor: pointer;
+      border: none; font-family: var(--sans);
+      font-size: 10px; padding: 7px 12px 7px 10px;
+      transition: background .2s;
+    }
+    .f-video-btn:hover { background: rgba(20,19,17,0.85); }
     .featured-more {
       display: inline-block; margin-top: 14px;
       font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
@@ -1521,15 +1529,17 @@ window.SITE_OPTIONS = {
     function buildFeatured(w) {
       const item = document.createElement('article');
       item.className = 'featured-item reveal';
-      const still = firstStill(w) || (getThumb(w) && isYT(getThumb(w)) ? ytThumb(getThumb(w)) : getThumb(w));
-      const n = getImages(w).length;
-      const hasVideo = getImages(w).some(isYT) || w.category === 'video';
+      const imgs = getImages(w);
+      const vIdx = imgs.findIndex(isYT);                 // 첫 번째 영상 위치
+      const hasVideo = vIdx !== -1;
+      const still = firstStill(w) || (hasVideo ? ytThumb(imgs[vIdx]) : getThumb(w));
+      const n = imgs.length;
       const moreKo = hasVideo ? '영상 · 이미지 ' + n + '점 보기' : '이미지 ' + n + '점 보기';
       const moreEn = hasVideo ? 'View video & ' + n + ' images' : 'View ' + n + ' images';
       item.innerHTML =
         '<div class="g-frame">' +
         (still ? `<img class="g-img" src="${esc(still)}" alt="${esc(t(w,'title'))}" loading="lazy">` : '') +
-        (hasVideo ? `<span class="yt-play-icon">Video</span>` : '') +
+        (hasVideo ? `<button type="button" class="yt-play-icon f-video-btn" data-go="video">Play video</button>` : '') +
         '</div>' +
         `<div class="featured-meta">
            <h3 class="featured-title">${esc(t(w,'title'))}<span class="f-year">${esc(catLabel(w.category))} · ${esc(w.year || '')}</span></h3>
@@ -1538,7 +1548,12 @@ window.SITE_OPTIONS = {
              <span class="featured-more">${esc(lang === 'en' ? moreEn : moreKo)} →</span>
            </div>
          </div>`;
-      item.addEventListener('click', () => openModal(w));
+      /* 모서리의 Play video → 영상부터 / 그 밖의 곳 → 첫 이미지부터 */
+      item.addEventListener('click', e => {
+        const toVideo = hasVideo && e.target.closest('[data-go="video"]');
+        const firstImg = Math.max(0, imgs.findIndex(u => u && !isYT(u)));
+        openModal(w, toVideo ? vIdx : firstImg);
+      });
       wireFrame(item, w, false);
       return item;
     }
@@ -1546,7 +1561,16 @@ window.SITE_OPTIONS = {
     /* 대표작 (전체 보기일 때만, Works 맨 위) */
     if (_activeFilter === 'all') {
       const list = [];
-      (OPT.featured || []).forEach(q => { const w = findWork(q); if (w && list.indexOf(w) === -1) list.push(w); });
+      (OPT.featured || []).forEach(q => {
+        let w = findWork(q);
+        if (!w || list.indexOf(w) !== -1) return;
+        /* 설정에 video 주소를 적으면 그 영상을 대표작 재생 영상으로 사용 */
+        if (q.video && isYT(q.video)) {
+          const rest = getImages(w).filter(u => u !== q.video);
+          w = Object.assign({}, w, { images_full: [q.video].concat(rest) });
+        }
+        list.push(w);
+      });
       works.forEach(w => { if (w.featured === true && list.indexOf(w) === -1) list.push(w); });
       if (list.length) {
         const sec = document.createElement('div');
@@ -1782,8 +1806,9 @@ window.SITE_OPTIONS = {
     document.getElementById('modalCaption').textContent = cap;
   }
 
-  function openModal(w) {
-    showModalImage(w, 0);
+  function openModal(w, start) {
+    const n = getImages(w).length;
+    showModalImage(w, Math.min(Math.max(0, start || 0), Math.max(0, n - 1)));
     modal.classList.add('open');
   }
 
