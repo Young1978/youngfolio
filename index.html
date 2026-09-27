@@ -136,7 +136,7 @@
     .rule { height: 1px; background: var(--line-soft); max-width: 1180px; margin: 0 auto; }
 
     /* 대문 다음 바로 포트폴리오 */
-    #portfolio { padding-top: 132px; }
+    #portfolio { padding-top: 120px; }
 
     /* ── Intro (미사용 · 마크업 복구 시 대비) ── */
     #top { padding: 0; }
@@ -239,33 +239,56 @@
       font-size: 10px; letter-spacing: 0.08em;
       color: var(--ink-soft);
     }
+    /* 정렬된 3열 격자 · 모든 칸은 같은 크기(4:3),
+       작품은 자르지 않고 원본 비율 그대로 칸 안에 맞춰 아래쪽에 정렬 */
     .gallery-grid-inner {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 36px 26px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px 30px;
     }
     .gallery-item { cursor: pointer; }
     .g-frame {
       position: relative;
       overflow: hidden;
-      aspect-ratio: 1;
-      background: var(--paper-2);
+      aspect-ratio: 4 / 3;
     }
-    .g-frame::after {
+    .featured-item .g-frame::after {
       content: '';
       position: absolute; inset: 0;
       border: 1px solid rgba(0,0,0,0.06);
       pointer-events: none;
+      z-index: 3;
     }
-    .gallery-item img {
+    .gallery-item img.g-img {
       width: 100%; height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      object-position: center bottom;
       display: block;
       transition: transform .8s cubic-bezier(.2,.7,.3,1);
     }
-    .gallery-item:hover img { transform: scale(1.04); }
+    /* 마우스를 올리면 같은 작품의 다른 컷이 차례로 겹쳐 나타남 */
+    .g-cycle {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: contain;
+      object-position: center bottom;
+      background: var(--paper);
+      opacity: 0;
+      transition: opacity .7s ease;
+      z-index: 1;
+    }
+    .g-cycle.show { opacity: 1; }
+    .g-clip {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0; transition: opacity .5s ease;
+      z-index: 2;
+    }
+    .g-clip.show { opacity: 1; }
+    .gallery-item:hover img.g-img { transform: scale(1.02); transform-origin: center bottom; }
     .g-view {
-      position: absolute; left: 0; bottom: 0;
+      position: absolute; left: 0; bottom: 0; z-index: 4;
       background: var(--ink); color: var(--paper);
       font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
       padding: 8px 14px;
@@ -273,31 +296,85 @@
       transition: opacity .3s, transform .3s;
     }
     .gallery-item:hover .g-view { opacity: 1; transform: translateY(0); }
+    .g-count-badge {
+      position: absolute; right: 10px; top: 10px; z-index: 4;
+      font-size: 9px; letter-spacing: 0.14em;
+      color: #fff; background: rgba(20,19,17,0.5);
+      padding: 4px 8px;
+      opacity: 0; transition: opacity .3s;
+    }
+    .gallery-item:hover .g-count-badge { opacity: 1; }
     .g-meta {
       display: flex; align-items: baseline; justify-content: space-between;
       gap: 14px; margin-top: 14px;
     }
     .g-title { font-size: 15px; font-weight: 300; letter-spacing: -0.01em; line-height: 1.5; }
     .g-year { font-size: 11px; letter-spacing: 0.1em; color: var(--ink-soft); white-space: nowrap; }
+    .g-vid { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin-right: 10px; }
+    .g-vid::before { content: '▶ '; font-size: 7px; vertical-align: 1px; }
+    .gallery-item.ph-1 .g-frame, .gallery-item.ph-2 .g-frame, .gallery-item.ph-3 .g-frame,
+    .gallery-item.ph-4 .g-frame, .gallery-item.ph-5 .g-frame, .gallery-item.ph-6 .g-frame { border: 1px solid var(--line-soft); }
     .g-desc {
       font-size: 12px; color: var(--ink-soft); line-height: 1.65;
       margin-top: 5px;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
       overflow: hidden;
     }
+    /* 영상 작품 표시 — 이미지를 가리지 않도록 모서리 배지로 */
     .yt-play-icon {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      background: rgba(20,19,17,0.6);
-      color: #fff; font-size: 16px;
-      display: flex; align-items: center; justify-content: center;
-      padding-left: 3px;
-      transition: background .25s;
+      position: absolute; left: 10px; top: 10px; z-index: 4;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: #fff;
+      background: rgba(20,19,17,0.55);
+      padding: 4px 9px 4px 8px;
       pointer-events: none;
     }
-    .gallery-item:hover .yt-play-icon { background: rgba(20,19,17,0.82); }
+    .yt-play-icon::before { content: '▶'; font-size: 8px; }
+
+    /* ── Selected Works (대표작 · 전체 폭) ── */
+    .featured { margin-bottom: 110px; }
+    .featured-item { cursor: pointer; margin-bottom: 96px; }
+    .featured-item:last-child { margin-bottom: 0; }
+    /* 대표작 칸은 격자용 4:3 비율을 따르지 않고 사진 높이에 딱 맞춤 */
+    .featured-item .g-frame { aspect-ratio: auto; min-height: 240px; background: var(--paper-2); }
+    .featured-item .g-frame.is-loaded { min-height: 0; }
+    .featured-item img.g-img {
+      width: 100%; height: auto;
+      max-height: 82vh;
+      object-fit: contain;
+      display: block; margin: 0 auto;
+      transition: transform 1.2s cubic-bezier(.2,.7,.3,1);
+    }
+    .featured-item:hover img.g-img { transform: scale(1.015); }
+    .featured-item .g-cycle { object-fit: contain; object-position: center; background: var(--paper); }
+    .featured-meta {
+      display: grid;
+      grid-template-columns: 1fr minmax(0, 420px);
+      gap: 48px;
+      align-items: start;
+      margin-top: 26px;
+    }
+    .featured-title {
+      font-family: var(--serif);
+      font-weight: 200;
+      font-size: clamp(26px, 3.4vw, 44px);
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+    }
+    .featured-title .f-year {
+      display: block;
+      font-family: var(--sans);
+      font-size: 11px; letter-spacing: 0.18em;
+      color: var(--ink-soft);
+      margin-top: 12px;
+    }
+    .featured-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.8; padding-top: 8px; }
+    .featured-more {
+      display: inline-block; margin-top: 14px;
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--ink); border-bottom: 1px solid var(--ink); padding-bottom: 2px;
+    }
     .gallery-item.ph-1 .g-frame { background: linear-gradient(160deg,#ded8d0,#cdc6bd); }
     .gallery-item.ph-2 .g-frame { background: linear-gradient(160deg,#d3d7dc,#c2c7ce); }
     .gallery-item.ph-3 .g-frame { background: linear-gradient(160deg,#dfd2cf,#cec0bc); }
@@ -614,26 +691,45 @@
     .sent-btn:hover { background: transparent; color: var(--ink); }
 
     /* ── Gate (대문) ── */
-    body.gate-open { overflow: hidden; }
+    /* 첫 화면 : 클릭 없이 스크롤하면 바로 작품으로 이어지는 전체화면 영역 */
     #gate {
-      position: fixed; inset: 0; z-index: 500;
+      position: relative;
+      height: 100vh; height: 100svh;
+      min-height: 480px;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      cursor: pointer;
       background: #171614;
       overflow: hidden;
-      transition: opacity .9s ease, visibility .9s;
+      cursor: default;
     }
-    #gate.closing { opacity: 0; visibility: hidden; }
     .gate-bg {
       position: absolute; inset: 0;
-      background-color: var(--gate-tint, #b9b2a8);
+      background-color: var(--gate-tint, #2a2825);
       background-image: var(--gate-art, none);
       background-size: cover;
       background-position: center;
       animation: gateZoom 10s ease-out forwards;
     }
     @keyframes gateZoom { from { transform: scale(1.10); } to { transform: scale(1.0); } }
+    /* 배경 영상 (mp4 또는 유튜브) — 로드되면 이미지 위로 서서히 나타남 */
+    .gate-video {
+      position: absolute; inset: 0;
+      overflow: hidden;
+      opacity: 0; transition: opacity 1.6s ease;
+      pointer-events: none;
+    }
+    .gate-video.show { opacity: 1; }
+    .gate-video video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .gate-video iframe {
+      position: absolute; top: 50%; left: 50%;
+      width: 100vw; height: 56.25vw;          /* 16:9 */
+      min-width: 177.78vh; min-height: 100vh; /* 화면을 꽉 채우도록 */
+      transform: translate(-50%, -50%) scale(1.02);
+      border: 0;
+    }
     .gate-veil {
       position: absolute; inset: 0;
       background: linear-gradient(to bottom, rgba(15,14,13,0.44), rgba(15,14,13,0.16) 38%, rgba(15,14,13,0.64));
@@ -673,21 +769,48 @@
       padding-left: 0.4em;
     }
     .gate-work {
-      position: absolute; left: 0; right: 0; bottom: 84px;
-      z-index: 2; text-align: center;
+      position: absolute; left: var(--pad); bottom: 40px;
+      z-index: 2;
       font-size: 11px; letter-spacing: 0.12em;
-      color: rgba(246,244,239,0.6);
-      padding: 0 24px;
+      color: rgba(246,244,239,0.7);
+      max-width: 50%;
       animation: gateIn 1.8s cubic-bezier(.2,.7,.3,1) both;
     }
     .gate-enter {
-      position: absolute; left: 0; right: 0; bottom: 40px;
-      z-index: 2; text-align: center;
+      position: absolute; left: 50%; bottom: 30px;
+      transform: translateX(-50%);
+      z-index: 2;
+      background: none; border: none; cursor: pointer;
+      font-family: var(--sans);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
       font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
       color: rgba(246,244,239,0.85);
-      animation: gatePulse 2.6s ease-in-out infinite;
+      padding: 8px 12px 0 calc(12px + 0.3em);
     }
-    @keyframes gatePulse { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
+    .gate-enter::after {
+      content: '';
+      width: 1px; height: 38px;
+      background: linear-gradient(to bottom, rgba(246,244,239,0.85), rgba(246,244,239,0));
+      transform-origin: top;
+      animation: gateLine 2.4s ease-in-out infinite;
+    }
+    @keyframes gateLine {
+      0%   { transform: scaleY(0); opacity: 1; }
+      60%  { transform: scaleY(1); opacity: 1; }
+      100% { transform: scaleY(1); opacity: 0; }
+    }
+
+    /* 첫 화면 위에 있을 때 상단 메뉴는 투명 + 밝은 글자 */
+    nav.on-hero { background: transparent; backdrop-filter: none; border-bottom-color: transparent; }
+    nav.on-hero .nav-name,
+    nav.on-hero .nav-links a,
+    nav.on-hero .lang-btn { color: rgba(246,244,239,0.82); }
+    nav.on-hero .nav-links a:hover,
+    nav.on-hero .lang-btn.active { color: #fff; border-bottom-color: #fff; }
+    nav.on-hero .nav-lang .lang-btn + .lang-btn { border-left-color: rgba(246,244,239,0.35); }
+    nav, .nav-name, .nav-links a, .lang-btn { transition: background .35s, color .35s, border-color .35s; }
+    .side-nav { transition: opacity .35s; }
+    .side-nav.on-hero { opacity: 0; pointer-events: none; }
 
     /* ── Reveal ── */
     .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
@@ -695,11 +818,10 @@
 
     /* ── Responsive ── */
     @media (max-width: 1200px) { .side-nav { display: none; } }
-    @media (max-width: 1100px) {
-      .gallery-grid-inner { grid-template-columns: repeat(3, 1fr); }
-    }
     @media (max-width: 780px) {
-      .gallery-grid-inner { grid-template-columns: repeat(2, 1fr); }
+      .gallery-grid-inner { grid-template-columns: repeat(2, 1fr); gap: 36px 20px; }
+      .featured-meta { grid-template-columns: 1fr; gap: 10px; }
+      .featured-item { margin-bottom: 72px; }
     }
     @media (max-width: 900px) {
       :root { --pad: 24px; }
@@ -718,7 +840,8 @@
       section { padding: 76px 0; }
       #portfolio { padding-top: 96px; }
       #intro { padding-top: 118px; padding-bottom: 56px; }
-      .gallery-grid-inner { grid-template-columns: repeat(2, 1fr); gap: 26px 16px; }
+      .gallery-grid-inner { grid-template-columns: repeat(2, 1fr); gap: 28px 14px; }
+      .featured { margin-bottom: 72px; }
       .g-desc { display: none; }
       nav { padding: 0 18px; height: 56px; }
       .nav-name { font-size: 14px; }
@@ -727,8 +850,8 @@
       .lang-btn { font-size: 9px; letter-spacing: 0.06em; }
       .nav-lang { gap: 6px; margin-left: 0; }
       .nav-lang .lang-btn + .lang-btn { padding-left: 7px; }
-      .gate-work { bottom: 76px; font-size: 10px; }
-      .gate-enter { bottom: 34px; }
+      .gate-work { left: 0; right: 0; bottom: 96px; max-width: none; text-align: center; font-size: 10px; padding: 0 24px; }
+      .gate-enter { bottom: 22px; }
     }
     @media (max-width: 560px) {
       .nav-name { display: none; }
@@ -737,17 +860,19 @@
     @media (prefers-reduced-motion: reduce) {
       .gate-bg { animation: none; }
       .gate-inner, .gate-work { animation: none; }
-      .gate-enter { animation: none; opacity: .8; }
+      .gate-enter::after { animation: none; }
+      .gate-video { display: none; }
       .reveal { transition: none; opacity: 1; transform: none; }
     }
   </style>
 </head>
 
-<body class="gate-open">
+<body>
 
-<!-- ── Gate · 대문 (가장 최근 작품 전체화면) ── -->
-<div id="gate" role="button" tabindex="0" aria-label="사이트 입장">
+<!-- ── Gate · 첫 화면 (대표 영상 / 최근 작품 전체화면, 스크롤하면 바로 작품으로) ── -->
+<header id="gate">
   <div class="gate-bg" id="gateBg"></div>
+  <div class="gate-video" id="gateVideo" aria-hidden="true"></div>
   <div class="gate-veil"></div>
   <div class="gate-inner">
     <p class="gate-label" id="gateLabel"></p>
@@ -755,8 +880,8 @@
     <span class="gate-name-en" id="gateNameEn"></span>
   </div>
   <p class="gate-work" id="gateWork"></p>
-  <p class="gate-enter">Click to enter</p>
-</div>
+  <button type="button" class="gate-enter" id="gateEnter">Works</button>
+</header>
 
 <!-- ── Navigation ── -->
 <nav id="nav">
@@ -897,6 +1022,31 @@ window.__EMBEDDED_DATA__ = {"artist":{"nameKo":"최영환","nameEn":"Younghwan C
 window.__EMBEDDED_DATA__.__isEmbedded = true;
 window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
 /* [SITE_CONTENT_END] */
+</script>
+
+<!-- ── 화면 연출 설정 (관리자 페이지와 별개 · 여기서 직접 고치세요) ── -->
+<script>
+window.SITE_OPTIONS = {
+  /* 첫 화면 배경 영상 : 유튜브 주소 또는 mp4 파일 경로 (예: 'videos/hero.mp4')
+     · mp4 를 쓰면 유튜브 로고 없이 가장 깔끔합니다 (10~20초, 소리 없는 반복용, 5MB 이하 권장)
+     · 비워두면('') 가장 최근 작품 사진이 나옵니다 */
+  heroVideo: 'https://youtu.be/bT4N7zDQqfw',
+  /* 첫 화면 아래에 적힐 작품 (영상이 나올 때 이 작품의 사진이 먼저 깔립니다) */
+  heroWork: { title: '다이얼로그', category: 'video' },
+
+  /* 대표작 : Works 맨 위에 화면 전체 폭으로 크게 보여줄 작품 (순서대로)
+     · title 은 작품 제목과 똑같이, 제목이 겹치면 category 나 year 를 함께 적으세요 */
+  featured: [
+    { title: '다이얼로그', category: 'video' },
+    { title: '우리는 무엇을 위해 싸우는가?', year: '2020' },
+    { title: '백가쟁명', category: 'installation' }
+  ],
+
+  /* 썸네일용 짧은 반복 영상 (mp4, 소리 없음, 5~10초) — 있으면 마우스를 올릴 때 재생
+     예) '다이얼로그': 'videos/dialogue_loop.mp4' */
+  clips: {
+  }
+};
 </script>
 
 <script>
@@ -1179,20 +1329,38 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
   }
 
   let _gateWork = null;
+  const OPT = window.SITE_OPTIONS || {};
+
+  /* 설정의 {title, category, year} 로 작품 찾기 */
+  function findWork(q) {
+    if (!q) return null;
+    const norm = x => String(x || '').replace(/\s+/g, ' ').trim();
+    return (C.works || []).find(w =>
+      (norm(w.title) === norm(q.title) || norm(w.titleEn) === norm(q.title)) &&
+      (!q.category || w.category === q.category) &&
+      (!q.year || String(w.year) === String(q.year))
+    ) || null;
+  }
+  function firstStill(w) {
+    return w ? (getImages(w).find(u => u && !isYT(u)) || '') : '';
+  }
+
   function renderGate() {
     const gate = document.getElementById('gate');
     if (!gate) return;
     const a = C.artist || {};
 
-    /* 가장 최근 작품(연도 내림차순) 중 이미지가 있는 첫 작품 */
-    const works = [...(C.works || [])].sort((x, y) => yearNum(y) - yearNum(x));
+    /* 1) 설정된 첫 화면 작품 → 2) 가장 최근 작품(이미지가 있는 첫 작품) → 3) heroBgImage */
     let art = '';
-    for (const w of works) {
-      const imgs = getImages(w);
-      const src = imgs.find(u => u && !isYT(u));
-      if (src) { art = src; _gateWork = w; break; }
+    const hw = findWork(OPT.heroWork);
+    if (hw && firstStill(hw)) { _gateWork = hw; art = firstStill(hw); }
+    if (!art) {
+      const works = [...(C.works || [])].sort((x, y) => yearNum(y) - yearNum(x));
+      for (const w of works) {
+        const src = firstStill(w);
+        if (src) { art = src; _gateWork = w; break; }
+      }
     }
-    /* 작품 이미지가 하나도 없으면 artist.heroBgImage 사용 */
     if (!art && a.heroBgImage) art = a.heroBgImage;
 
     const bg = document.getElementById('gateBg');
@@ -1201,20 +1369,45 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
       const pre = new Image(); pre.src = art;
     }
     gateTexts();
+    mountHeroVideo();
 
-    let closed = false;
-    function enter() {
-      if (closed) return;
-      closed = true;
-      gate.classList.add('closing');
-      document.body.classList.remove('gate-open');
-      setTimeout(() => { if (gate.parentNode) gate.remove(); }, 950);
+    /* 아래 버튼 → 작품으로 부드럽게 이동 */
+    const btn = document.getElementById('gateEnter');
+    if (btn) btn.addEventListener('click', () => {
+      document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  /* 첫 화면 배경 영상 — 움직임 줄이기 설정 / 데이터 절약 모드에서는 사진만 */
+  function mountHeroVideo() {
+    const box = document.getElementById('gateVideo');
+    const src = (OPT.heroVideo || '').trim();
+    if (!box || !src) return;
+    try {
+      if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (navigator.connection && navigator.connection.saveData) return;
+    } catch (e) {}
+
+    if (isYT(src)) {
+      const id = ytId(src);
+      const q = 'autoplay=1&mute=1&loop=1&playlist=' + id +
+                '&controls=0&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&fs=0';
+      const f = document.createElement('iframe');
+      f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?' + q;
+      f.allow = 'autoplay; encrypted-media';
+      f.setAttribute('tabindex', '-1');
+      f.title = 'background video';
+      /* 유튜브 초기 화면(제목·로고)이 사라질 시간을 두고 서서히 표시 */
+      f.addEventListener('load', () => setTimeout(() => box.classList.add('show'), 1800));
+      box.appendChild(f);
+    } else {
+      const v = document.createElement('video');
+      v.src = src; v.muted = true; v.loop = true; v.autoplay = true;
+      v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto';
+      v.addEventListener('playing', () => box.classList.add('show'), { once: true });
+      box.appendChild(v);
+      const p = v.play(); if (p && p.catch) p.catch(() => {});
     }
-    gate.addEventListener('click', enter);
-    gate.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') enter(); });
-    gate.addEventListener('wheel', enter, { passive: true });
-    gate.addEventListener('touchmove', enter, { passive: true });
-    try { gate.focus({ preventScroll: true }); } catch (e) {}
   }
 
   /* ── CV ── */
@@ -1285,21 +1478,64 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
       const item = document.createElement('div');
       const thumbRaw = getThumb(w);
       const thumbSrc = thumbRaw ? (isYT(thumbRaw) ? ytThumb(thumbRaw) : thumbRaw) : '';
-      const isYTThumb = thumbRaw && isYT(thumbRaw);
+      const hasVideo = getImages(w).some(isYT) || w.category === 'video';
+      const n = getImages(w).length;
       item.className = 'gallery-item' + (thumbSrc ? '' : ' ph-' + ((i % 6) + 1));
       item.dataset.cat = w.category || '';
       item.innerHTML =
         '<div class="g-frame">' +
-        (thumbSrc ? `<img src="${esc(thumbSrc)}" alt="${esc(t(w,'title'))}" loading="lazy">` : '') +
-        (isYTThumb ? `<div class="yt-play-icon">▶</div>` : '') +
-        `<span class="g-view">View</span></div>` +
+        (thumbSrc ? `<img class="g-img" src="${esc(thumbSrc)}" alt="${esc(t(w,'title'))}" loading="lazy">` : '') +
+        `<span class="g-view">View${n > 1 ? ' · ' + n : ''}</span></div>` +
         `<div class="g-meta">
            <span class="g-title">${esc(t(w,'title'))}</span>
-           <span class="g-year">${esc(w.year || '')}</span>
+           <span class="g-year">${hasVideo ? '<span class="g-vid">Video</span>' : ''}${esc(w.year || '')}</span>
          </div>` +
         (t(w,'desc') ? `<p class="g-desc">${esc(t(w,'desc'))}</p>` : '');
       item.addEventListener('click', () => openModal(w));
+      wireFrame(item, w, true);
       return item;
+    }
+
+    function buildFeatured(w) {
+      const item = document.createElement('article');
+      item.className = 'featured-item reveal';
+      const still = firstStill(w) || (getThumb(w) && isYT(getThumb(w)) ? ytThumb(getThumb(w)) : getThumb(w));
+      const n = getImages(w).length;
+      const hasVideo = getImages(w).some(isYT) || w.category === 'video';
+      const moreKo = hasVideo ? '영상 · 이미지 ' + n + '점 보기' : '이미지 ' + n + '점 보기';
+      const moreEn = hasVideo ? 'View video & ' + n + ' images' : 'View ' + n + ' images';
+      item.innerHTML =
+        '<div class="g-frame">' +
+        (still ? `<img class="g-img" src="${esc(still)}" alt="${esc(t(w,'title'))}" loading="lazy">` : '') +
+        (hasVideo ? `<span class="yt-play-icon">Video</span>` : '') +
+        '</div>' +
+        `<div class="featured-meta">
+           <h3 class="featured-title">${esc(t(w,'title'))}<span class="f-year">${esc(catLabel(w.category))} · ${esc(w.year || '')}</span></h3>
+           <div>
+             ${t(w,'desc') ? `<p class="featured-desc">${esc(t(w,'desc'))}</p>` : ''}
+             <span class="featured-more">${esc(lang === 'en' ? moreEn : moreKo)} →</span>
+           </div>
+         </div>`;
+      item.addEventListener('click', () => openModal(w));
+      wireFrame(item, w, false);
+      return item;
+    }
+
+    /* 대표작 (전체 보기일 때만, Works 맨 위) */
+    if (_activeFilter === 'all') {
+      const list = [];
+      (OPT.featured || []).forEach(q => { const w = findWork(q); if (w && list.indexOf(w) === -1) list.push(w); });
+      works.forEach(w => { if (w.featured === true && list.indexOf(w) === -1) list.push(w); });
+      if (list.length) {
+        const sec = document.createElement('div');
+        sec.className = 'featured';
+        const h = document.createElement('h3');
+        h.className = 'gallery-group-h reveal';
+        h.innerHTML = `${lang === 'en' ? 'Selected Works' : 'Selected Works · 대표작'}<span class="g-count">${list.length}</span>`;
+        sec.appendChild(h);
+        list.forEach(w => sec.appendChild(buildFeatured(w)));
+        grid.appendChild(sec);
+      }
     }
 
     // 매체별로 묶어서 섹션 렌더 (전체면 모든 그룹, 필터 시 해당 그룹만)
@@ -1329,6 +1565,98 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
       grid.appendChild(sec);
     });
     if (typeof wireReveal === 'function') wireReveal();
+  }
+
+  /* ── 썸네일 움직임 ──
+     · 설정에 짧은 반복 영상(clips)이 있으면 마우스를 올릴 때 재생
+     · 없고 이미지가 여러 장이면 다른 컷이 천천히 겹쳐 바뀜
+     · 터치 화면에서는 화면 가운데에 올 때 자동으로 같은 효과 */
+  const CAN_HOVER = !!(window.matchMedia && matchMedia('(hover: hover)').matches);
+  const REDUCED = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  let _touchIO = null;
+  function clipFor(w) {
+    const m = OPT.clips || {};
+    return w.clip || m[w.title] || m[(w.title || '').trim()] || m[w.titleEn] || '';
+  }
+  function wireFrame(item, w, isGrid) {
+    const frame = item.querySelector('.g-frame');
+    const img = item.querySelector('img.g-img');
+    if (img) {
+      const done = () => frame.classList.add('is-loaded');
+      if (img.complete && img.naturalWidth) done(); else img.addEventListener('load', done, { once: true });
+      img.addEventListener('error', done, { once: true });
+    }
+    if (REDUCED) return;
+
+    const clip = clipFor(w);
+    const stills = getImages(w).filter(u => u && !isYT(u));
+    const first = img ? img.getAttribute('src') : '';
+    const others = stills.filter(u => u !== first).slice(0, 5);
+    if (!clip && !others.length) return;
+
+    let timer = null, video = null, layers = [], k = -1;
+    function start() {
+      if (clip) {
+        if (!video) {
+          video = document.createElement('video');
+          video.className = 'g-clip'; video.src = clip;
+          video.muted = true; video.loop = true; video.playsInline = true;
+          video.setAttribute('playsinline', ''); video.preload = 'none';
+          video.addEventListener('playing', () => video.classList.add('show'));
+          frame.appendChild(video);
+        }
+        const p = video.play(); if (p && p.catch) p.catch(() => {});
+        return;
+      }
+      preload();
+      if (timer) return;
+      /* 다 불러온 컷만 보여줌 — 아직 로딩 중인 컷은 건너뛰어 흰 화면이 번쩍이지 않게 */
+      const ready = l => l.complete && l.naturalWidth > 0;
+      const step = () => {
+        const ok = layers.filter(ready);
+        if (!ok.length) return;                  // 아직 준비된 컷이 없으면 원래 이미지 유지
+        k = (k + 1) % (ok.length + 1);           // 마지막 단계는 원래 대표 이미지
+        layers.forEach(l => l.classList.toggle('show', l === ok[k]));
+      };
+      /* 첫 전환은 준비된 컷이 있을 때 바로, 아니면 첫 컷이 로드되는 즉시 */
+      if (layers.some(ready)) step();
+      else layers.forEach(l => l.addEventListener('load', () => { if (timer && k === -1) step(); }, { once: true }));
+      timer = setInterval(step, isGrid ? 1300 : 2200);
+    }
+    function stop() {
+      if (video) { video.pause(); video.classList.remove('show'); }
+      if (timer) { clearInterval(timer); timer = null; }
+      layers.forEach(l => l.classList.remove('show')); k = -1;
+    }
+    /* 화면에 들어오면 다른 컷을 미리 조용히 받아둠 (마우스를 올리는 순간 바로 나오도록) */
+    function preload() {
+      if (clip || layers.length) return;
+      layers = others.map(u => {
+        const im = document.createElement('img');
+        im.className = 'g-cycle'; im.src = u; im.alt = ''; im.decoding = 'async';
+        frame.insertBefore(im, frame.querySelector('.yt-play-icon, .g-view'));
+        return im;
+      });
+    }
+    if (CAN_HOVER && 'IntersectionObserver' in window) {
+      const pio = new IntersectionObserver(es => {
+        if (es.some(e => e.isIntersecting)) { pio.disconnect(); setTimeout(preload, 600); }
+      }, { rootMargin: '0px 0px 200px 0px' });
+      pio.observe(frame);
+    }
+    if (CAN_HOVER) {
+      frame.addEventListener('mouseenter', start);
+      frame.addEventListener('mouseleave', stop);
+    } else if ('IntersectionObserver' in window) {
+      if (!_touchIO) {
+        _touchIO = new IntersectionObserver(es => es.forEach(e => {
+          const f = e.target.__motion; if (!f) return;
+          e.isIntersecting ? f.start() : f.stop();
+        }), { rootMargin: '-35% 0px -35% 0px' });
+      }
+      frame.__motion = { start, stop };
+      _touchIO.observe(frame);
+    }
   }
   function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
@@ -1668,8 +1996,15 @@ window.SITE_CONTENT = window.SITE_CONTENT || window.__EMBEDDED_DATA__;
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-links a');
     const sideLinks = document.querySelectorAll('.side-nav a');
+    const gate = document.getElementById('gate');
+    const side = document.querySelector('.side-nav');
     function onScroll() {
-      if (nav) nav.classList.toggle('scrolled', window.scrollY > 12);
+      const onHero = !!gate && window.scrollY < gate.offsetHeight - 70;
+      if (nav) {
+        nav.classList.toggle('on-hero', onHero);
+        nav.classList.toggle('scrolled', !onHero && window.scrollY > 12);
+      }
+      if (side) side.classList.toggle('on-hero', onHero);
       let current = '';
       sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
       navLinks.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + current));
