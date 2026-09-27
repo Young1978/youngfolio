@@ -1038,7 +1038,7 @@ window.SITE_OPTIONS = {
      · title 은 작품 제목과 똑같이, 제목이 겹치면 category 나 year 를 함께 적으세요 */
   featured: [
     { title: '다이얼로그', category: 'video' },
-    { title: '우리는 무엇을 위해 싸우는가?', year: '2020' },
+    { title: '모던 가든', category: 'installation' },
     { title: '백가쟁명', category: 'installation' }
   ],
 
@@ -1391,15 +1391,37 @@ window.SITE_OPTIONS = {
     if (isYT(src)) {
       const id = ytId(src);
       const q = 'autoplay=1&mute=1&loop=1&playlist=' + id +
-                '&controls=0&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&fs=0';
+                '&controls=0&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&fs=0' +
+                '&enablejsapi=1&origin=' + encodeURIComponent(location.origin);
       const f = document.createElement('iframe');
       f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?' + q;
       f.allow = 'autoplay; encrypted-media';
       f.setAttribute('tabindex', '-1');
       f.title = 'background video';
-      /* 유튜브 초기 화면(제목·로고)이 사라질 시간을 두고 서서히 표시 */
-      f.addEventListener('load', () => setTimeout(() => box.classList.add('show'), 1800));
       box.appendChild(f);
+
+      /* 실제로 재생이 시작됐을 때만 영상을 보여줌.
+         자동재생이 막히면(재생 버튼·제목이 뜨는 상태) 영상은 숨기고 작품 사진을 그대로 둔다. */
+      let showTimer = null;
+      const send = obj => { try { f.contentWindow.postMessage(JSON.stringify(obj), '*'); } catch (e) {} };
+      window.addEventListener('message', e => {
+        if (!/youtube(-nocookie)?\.com$/.test(new URL(e.origin).hostname)) return;
+        let d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (err) { return; }
+        const st = d && d.info && typeof d.info.playerState === 'number' ? d.info.playerState
+                 : (d && d.event === 'onStateChange' ? d.info : null);
+        if (st === 1) {                       // 재생 중 → 유튜브 제목이 사라질 시간을 두고 표시
+          if (!showTimer && !box.classList.contains('show'))
+            showTimer = setTimeout(() => box.classList.add('show'), 2500);
+        } else if (st === 2 || st === -1 || st === 5) {   // 멈춤/시작 전 → 숨김
+          clearTimeout(showTimer); showTimer = null;
+          box.classList.remove('show');
+        }
+      });
+      f.addEventListener('load', () => {
+        send({ event: 'listening', id: 1, channel: 'widget' });
+        send({ event: 'command', func: 'mute', args: [] });
+        send({ event: 'command', func: 'playVideo', args: [] });
+      });
     } else {
       const v = document.createElement('video');
       v.src = src; v.muted = true; v.loop = true; v.autoplay = true;
