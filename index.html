@@ -1473,7 +1473,8 @@ window.SITE_OPTIONS = {
     /* 아래 버튼 → 작품으로 부드럽게 이동 */
     const btn = document.getElementById('gateEnter');
     if (btn) btn.addEventListener('click', () => {
-      document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
+      const t = document.getElementById('portfolio');
+      if (window.__goToSection) window.__goToSection(t); else t.scrollIntoView({ behavior: 'smooth' });
     });
   }
 
@@ -1944,7 +1945,7 @@ window.SITE_OPTIONS = {
     const item = document.querySelectorAll('#paperList .paper-item')[i];
     if (!item) return;
     item.classList.add('in');
-    item.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (window.__goToSection) window.__goToSection(item); else item.scrollIntoView({ behavior: 'smooth', block: 'start' });
     item.classList.remove('flash'); void item.offsetWidth; item.classList.add('flash');
   }
 
@@ -2313,6 +2314,65 @@ window.SITE_OPTIONS = {
     onScroll();
   }
 
+  /* ── 메뉴 이동 ──
+     위쪽 작품 이미지가 이동 중에 늦게 로딩되거나(높이가 커짐) 모바일 주소창이 접히면
+     목표 위치가 아래로 밀려 '덜 가서 이미지에서 멈추는' 문제가 생긴다.
+     그래서 이동하는 동안 매 순간 목표 위치를 다시 재고, 도착한 뒤에도 잠시 위치를 보정한다.
+     사용자가 직접 스크롤하면 보정을 즉시 멈춘다. */
+  function wireAnchors() {
+    let job = 0;
+    const stop = () => { job++; };
+    ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(ev =>
+      window.addEventListener(ev, e => { if (!e.target.closest || !e.target.closest('a[href^="#"]')) stop(); }, { passive: true }));
+
+    function targetY(el) {
+      return Math.max(0, Math.min(
+        el.getBoundingClientRect().top + window.scrollY - (parseFloat(getComputedStyle(el).scrollMarginTop) || 0),
+        document.documentElement.scrollHeight - window.innerHeight));
+    }
+    function jump(y) { window.scrollTo({ top: y, behavior: 'instant' }); }
+
+    function goTo(el) {
+      const my = ++job;
+      const reduced = REDUCED;
+      const startY = window.scrollY;
+      const dur = reduced ? 0 : Math.min(1100, 450 + Math.abs(targetY(el) - startY) / 12);
+      const t0 = performance.now();
+      const ease = x => 1 - Math.pow(1 - x, 3);
+      let settleUntil = 0;
+      (function frame(now) {
+        if (my !== job) return;
+        const k = dur ? Math.min(1, (now - t0) / dur) : 1;
+        const goal = targetY(el);                       // 매 프레임 다시 계산
+        if (k < 1) {
+          jump(startY + (goal - startY) * ease(k));
+          return requestAnimationFrame(frame);
+        }
+        if (!settleUntil) settleUntil = now + 2500;     // 도착 후 2.5초간 위치 유지
+        if (Math.abs(window.scrollY - goal) > 1) jump(goal);
+        if (now < settleUntil) requestAnimationFrame(frame);
+      })(t0);
+    }
+
+    document.addEventListener('click', e => {
+      const a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      const id = a.getAttribute('href').slice(1);
+      const el = id && document.getElementById(id);
+      if (!el) return;
+      e.preventDefault();
+      goTo(el);
+      try { history.replaceState(null, '', '#' + id); } catch (err) {}
+    });
+    window.__goToSection = goTo;
+
+    /* 주소에 #texts 같은 위치가 붙어 들어온 경우에도 정확히 맞춤 */
+    if (location.hash.length > 1) {
+      const el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (el) setTimeout(() => goTo(el), 50);
+    }
+  }
+
   /* ── Reveal on scroll ──
      어떤 이유로든 관찰이 실패해도 내용은 반드시 보이도록 안전장치를 둔다 */
   function showAllReveal() {
@@ -2347,6 +2407,7 @@ window.SITE_OPTIONS = {
   run(renderExhibitions, 'exhibitions');
   run(wireFilter, 'filter');
   run(wireScroll, 'scroll');
+  run(wireAnchors, 'anchors');
   run(wireReveal, 'reveal');
 </script>
 </body>
